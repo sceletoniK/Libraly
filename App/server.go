@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	models "github.com/sceletoniK/Models"
+	"github.com/sirupsen/logrus"
 )
 
 type Libraly interface {
@@ -17,6 +18,7 @@ type Server struct {
 	router     *chi.Mux
 	db         Libraly
 	httpServer *http.Server
+	logger     *logrus.Logger
 }
 
 func NewServer(l Libraly) *Server {

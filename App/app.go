@@ -3,8 +3,16 @@ package app
 import (
 	"net"
 	"net/http"
+	"os"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
+
+func InitLogger() {
+	logrus.SetOutput(os.Stdout)
+	logrus.SetLevel(logrus.DebugLevel)
+}
 
 func Start(l Libraly) error {
 	s := NewServer(l)
@@ -18,5 +26,7 @@ func Start(l Libraly) error {
 	if err != nil {
 		return err
 	}
+	InitLogger()
+	s.logger.Info("Server start")
 	return s.httpServer.Serve(listener)
 }
