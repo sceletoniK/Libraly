@@ -20,5 +20,6 @@ func (s *Server) handlerNewBook(w http.ResponseWriter, r *http.Request) {
 		s.logger.Error(err)
 		return
 	}
+	s.responde(w, r, 200, "Книга добавлена")
 	s.logger.Info("Success")
 }

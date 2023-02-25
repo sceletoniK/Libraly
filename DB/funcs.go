@@ -8,19 +8,28 @@ import (
 )
 
 func (db *DB) AddBook(newBook models.NewBook) error {
-	if _, err := db.conn.ExecContext(context.Background(),
-		`insert into book(name, author, publisher) values ($1,$2,$3)`,
-		newBook.Name, newBook.Author, newBook.Publisher); err != nil {
-		return err
+	tx, err := db.conn.BeginTx(context.Background(), nil)
+	if err != nil {
+		return fmt.Errorf("(db) AddBook dont begin transaction: %w", err)
 	}
+	defer tx.Rollback()
+	if _, err := tx.ExecContext(context.Background(),
+		`insert into book (name, author, publisher) values ($1, $2, $3)`,
+		newBook.Name, newBook.Author, newBook.Publisher); err != nil {
+		return fmt.Errorf("(db) AddBook dont enter new book: %w", err)
+	}
+
 	var book models.Book
-	if err := db.conn.GetContext(context.Background(), book, `select * from book order by id desc limit 1`); err != nil {
-		return err
+	if err := db.conn.GetContext(context.Background(), &book, `select * from book order by id desc limit 1`); err != nil {
+		return fmt.Errorf("(db) AddBook dont select new book: %w", err)
 	}
 	for _, g := range newBook.Genres {
-		if _, err := db.conn.ExecContext(context.Background(), `insert into bookgenre(bookId, genreId) values ($1, $2)`, book.Id, g); err != nil {
-			return err
+		if _, err := tx.ExecContext(context.Background(), `insert into bookgenre(bookId, genreId) values ($1, $2)`, book.Id, g); err != nil {
+			return fmt.Errorf("(db) AddBook dont link genre: %w", err)
 		}
+	}
+	if err = tx.Commit(); err != nil {
+		return fmt.Errorf("(db) AddBook dont commit transaction: %w", err)
 	}
 	return nil
 }

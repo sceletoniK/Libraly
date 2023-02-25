@@ -25,13 +25,14 @@ func NewServer(l Libraly) *Server {
 	s := &Server{
 		router: chi.NewRouter(),
 		db:     l,
+		logger: logrus.New(),
 	}
 	s.configureRouter()
 	return s
 }
 
 func (s *Server) configureRouter() {
-
+	s.router.Post("/newbook", s.handlerNewBook)
 }
 
 func (s *Server) responde(w http.ResponseWriter, r *http.Request, code int, data interface{}) {

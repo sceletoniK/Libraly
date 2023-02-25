@@ -8,10 +8,10 @@ type Filter struct {
 }
 
 type NewBook struct {
-	Name      string `json:"name"`
-	Author    string `json:"author"`
-	Publisher string `json:"publisher"`
-	Genres    []int  `json:"genres"`
+	Name      string            `json:"name"`
+	Author    string            `json:"author"`
+	Publisher string            `json:"publisher"`
+	Genres    map[string]string `json:"genres"`
 }
 
 type Book struct {
