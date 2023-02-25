@@ -5,14 +5,16 @@ import (
 
 	app "github.com/sceletoniK/App"
 	"github.com/sceletoniK/DB"
+	"github.com/sceletoniK/config"
 )
 
 func main() {
-	db, err := DB.NewDB("postgres://postgres:scell876@localhost:5432/libraly?sslmode=disable")
+	cfg := config.NewConfig()
+	db, err := DB.NewDB("postgres://" + cfg.DBUser + ":" + cfg.DBPassword + "@localhost" + cfg.DBPort + "/" + cfg.DBName + "?sslmode=disable")
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err := app.Start(db); err != nil {
+	if err := app.Start(db, cfg); err != nil {
 		log.Fatal(err)
 	}
 }

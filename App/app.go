@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/sceletoniK/config"
 	"github.com/sirupsen/logrus"
 )
 
@@ -14,7 +15,7 @@ func InitLogger() {
 	logrus.SetLevel(logrus.DebugLevel)
 }
 
-func Start(l Libraly) error {
+func Start(l Libraly, cfg *config.Config) error {
 	s := NewServer(l)
 	handler := http.Handler(s.router)
 	s.httpServer = &http.Server{
@@ -22,7 +23,8 @@ func Start(l Libraly) error {
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 15 * time.Second,
 	}
-	listener, err := net.Listen("tcp", ":8080")
+	s.logger.Info(cfg.HTTPPort)
+	listener, err := net.Listen("tcp", cfg.HTTPPort)
 	if err != nil {
 		return err
 	}
