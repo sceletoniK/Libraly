@@ -33,6 +33,7 @@ func NewServer(l Libraly) *Server {
 
 func (s *Server) configureRouter() {
 	s.router.Post("/newbook", s.handlerNewBook)
+	s.router.Get("/filterbook", s.handlerFilterBooks)
 }
 
 func (s *Server) responde(w http.ResponseWriter, r *http.Request, code int, data interface{}) {

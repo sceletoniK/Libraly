@@ -37,26 +37,32 @@ func (db *DB) AddBook(newBook models.NewBook) error {
 func (db *DB) GetFilteredBooks(filter models.Filter) ([]models.Book, error) {
 	var books []models.Book
 
-	query := `select * from book, bookgenre where book.id = bookgenre.bookId`
-	and := " and "
+	query := `select book.id, book.name, book.author, book.publisher from book left join bookgenre on book.id = bookgenre.bookId`
+	and := " where "
 	if filter.Name != "" {
-		query += `name = ` + filter.Name
+		query += and + `name = '` + filter.Name + `'`
+		and = " and "
 	}
 	if filter.Author != "" {
-		query += and + `author = ` + filter.Author
+		query += and + `author = '` + filter.Author + `'`
+		and = " and "
 	}
 	if len(filter.Genres) > 0 {
 		query += and + `( `
-		for i, g := range filter.Genres {
+		i := 0
+		for _, g := range filter.Genres {
 			if i > 0 {
 				query += ` or `
 			}
-			query += fmt.Sprintf(`genre.genreId = %d`, g)
+			query += fmt.Sprintf(`bookgenre.genreId = %d`, g)
+			i++
 		}
 		query += ` )`
 	}
+	query += ` group by book.id, book.name, book.author, book.publisher`
+	fmt.Println(query)
 	if err := db.conn.SelectContext(context.Background(), &books, query); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("(db) GetFilterBooks cant select books: %w", err)
 	}
 	return books, nil
 }

@@ -1,17 +1,17 @@
 package models
 
 type Filter struct {
-	Name      string `json:"name"`
-	Author    string `json:"author"`
-	Publisher string `json:"publisher"`
-	Genres    []int  `json:"genres"`
+	Name      string         `json:"name"`
+	Author    string         `json:"author"`
+	Publisher string         `json:"publisher"`
+	Genres    map[string]int `json:"genres"`
 }
 
 type NewBook struct {
-	Name      string            `json:"name"`
-	Author    string            `json:"author"`
-	Publisher string            `json:"publisher"`
-	Genres    map[string]string `json:"genres"`
+	Name      string         `json:"name"`
+	Author    string         `json:"author"`
+	Publisher string         `json:"publisher"`
+	Genres    map[string]int `json:"genres"`
 }
 
 type Book struct {
