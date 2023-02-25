@@ -1,7 +1,7 @@
 begin;
 create table genre(
     id serial primary key,
-    name varchar(200)
+    name varchar(200) not null
 );
 create table book(
     id serial primary key,
@@ -31,7 +31,8 @@ create table bookrent(
     userId integer references user (id),
     instanceBookId integer references book (id),
     start timestamp,
-    end timestamp
+    end timestamp,
+    deadline timestamp not null
 );
 create view topgenres as
     select 
