@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	models "github.com/sceletoniK/Models"
+	"github.com/sceletoniK/models"
 )
 
 func (db *DB) AddBook(newBook models.NewBook) error {

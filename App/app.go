@@ -23,12 +23,14 @@ func Start(l Libraly, cfg *config.Config) error {
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 15 * time.Second,
 	}
-	s.logger.Info(cfg.HTTPPort)
 	listener, err := net.Listen("tcp", cfg.HTTPPort)
 	if err != nil {
 		return err
 	}
 	InitLogger()
-	s.logger.Info("Server start")
+	s.logger.Info("Server start with this parameters:")
+	s.logger.Info("Port: " + cfg.HTTPPort)
+	s.logger.Info("DB: " + cfg.DBName)
+	s.logger.Info("DBPort: " + cfg.DBPort)
 	return s.httpServer.Serve(listener)
 }

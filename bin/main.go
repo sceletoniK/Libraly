@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	app "github.com/sceletoniK/App"
 	"github.com/sceletoniK/DB"
+	"github.com/sceletoniK/app"
 	"github.com/sceletoniK/config"
 )
 

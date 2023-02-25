@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	models "github.com/sceletoniK/Models"
+	"github.com/sceletoniK/models"
 	"github.com/sirupsen/logrus"
 )
 

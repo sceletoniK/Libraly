@@ -3,7 +3,7 @@ package app
 import (
 	"net/http"
 
-	models "github.com/sceletoniK/Models"
+	"github.com/sceletoniK/models"
 )
 
 func (s *Server) handlerNewBook(w http.ResponseWriter, r *http.Request) {
