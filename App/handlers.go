@@ -15,7 +15,7 @@ func (s *Server) handlerNewBook(w http.ResponseWriter, r *http.Request) {
 		s.logger.Error(err)
 		return
 	}
-	if err = s.db.AddBook(book); err != nil {
+	if err = s.db.AddBook(r.Context(), book); err != nil {
 		s.httpError(w, r, 500, err)
 		s.logger.Error(err)
 		return
@@ -34,7 +34,7 @@ func (s *Server) handlerFilterBooks(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var books []models.Book
-	if books, err = s.db.GetFilteredBooks(filter); err != nil {
+	if books, err = s.db.GetFilteredBooks(r.Context(), filter); err != nil {
 		s.httpError(w, r, 500, err)
 		s.logger.Error(err)
 		return
@@ -52,7 +52,7 @@ func (s *Server) handlerRegisterUser(w http.ResponseWriter, r *http.Request) {
 		s.logger.Error(err)
 		return
 	}
-	if newUser, err = s.db.RegisterUser(newUser); err != nil {
+	if newUser, err = s.db.RegisterUser(r.Context(), newUser); err != nil {
 		s.httpError(w, r, 500, err)
 		s.logger.Error(err)
 		return

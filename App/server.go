@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 
@@ -10,9 +11,9 @@ import (
 )
 
 type Libraly interface {
-	AddBook(models.NewBook) error
-	GetFilteredBooks(models.Filter) ([]models.Book, error)
-	RegisterUser(models.User) (models.User, error)
+	AddBook(context.Context, models.NewBook) error
+	GetFilteredBooks(context.Context, models.Filter) ([]models.Book, error)
+	RegisterUser(context.Context, models.User) (models.User, error)
 }
 
 type Server struct {
