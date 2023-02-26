@@ -12,6 +12,7 @@ import (
 type Libraly interface {
 	AddBook(models.NewBook) error
 	GetFilteredBooks(models.Filter) ([]models.Book, error)
+	RegisterUser(models.User) (models.User, error)
 }
 
 type Server struct {
@@ -34,6 +35,8 @@ func NewServer(l Libraly) *Server {
 func (s *Server) configureRouter() {
 	s.router.Post("/newbook", s.handlerNewBook)
 	s.router.Get("/filterbook", s.handlerFilterBooks)
+	s.router.Post("/register", s.handlerRegisterUser)
+
 }
 
 func (s *Server) responde(w http.ResponseWriter, r *http.Request, code int, data interface{}) {

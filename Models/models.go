@@ -18,7 +18,7 @@ type User struct {
 	Id       int    `db:"id" json:"id"`
 	Login    string `db:"login" json:"login"`
 	Password string `db:"password" json:"password"`
-	Admin    int    `db:"admin" json:"admin"`
+	Admin    bool   `db:"admin" json:"admin"`
 }
 
 type Book struct {
