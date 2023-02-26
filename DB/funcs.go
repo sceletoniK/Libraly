@@ -9,7 +9,7 @@ import (
 )
 
 func (db *DB) AddBook(newBook models.NewBook) error {
-	tx, err := db.conn.BeginTx(context.Background(), nil)
+	tx, err := db.conn.BeginTxx(context.Background(), nil)
 	if err != nil {
 		return fmt.Errorf("(db) AddBook dont begin transaction: %w", err)
 	}
@@ -71,22 +71,19 @@ func (db *DB) GetFilteredBooks(filter models.Filter) ([]models.Book, error) {
 func (db *DB) RegisterUser(newUser models.User) (models.User, error) {
 	var addedUser models.User
 	var othersUsers []models.User
-	tx, err := db.conn.BeginTx(context.Background(), nil)
+	tx, err := db.conn.BeginTxx(context.Background(), nil)
 	if err != nil {
 		return addedUser, fmt.Errorf("(db) RegisterUser dont begin transaction: %w", err)
 	}
 	defer tx.Rollback()
-	if err := db.conn.SelectContext(context.Background(), &othersUsers, "select * from client where login = "+newUser.Login); err != nil {
+	if err := tx.SelectContext(context.Background(), &othersUsers, "select * from client where login = '"+newUser.Login+"'"); err != nil {
 		return addedUser, fmt.Errorf("(db) RegisterUser cant select users: %w", err)
 	}
 	if len(othersUsers) > 0 {
 		return addedUser, errors.New("(db) RegisterUser: new login isn't unique")
 	}
-	if _, err := tx.ExecContext(context.Background(), "insert into client (login, password, admin) values (%s,%s,%d)", newUser.Login, newUser.Password, 0); err != nil {
+	if err := tx.GetContext(context.Background(), &addedUser, "insert into client (login, password, admin) values ($1,$2,$3) returning *", newUser.Login, newUser.Password, 0); err != nil {
 		return addedUser, fmt.Errorf("(db) RegisterUser cant add new user: %w", err)
-	}
-	if err := db.conn.SelectContext(context.Background(), &addedUser, "select * from client order by id desc limit 1"); err != nil {
-		return addedUser, fmt.Errorf("(db) RegisterUser cant select new user: %w", err)
 	}
 	addedUser.Password = ""
 	if err = tx.Commit(); err != nil {

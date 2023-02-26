@@ -35,10 +35,28 @@ func (s *Server) handlerFilterBooks(w http.ResponseWriter, r *http.Request) {
 	}
 	var books []models.Book
 	if books, err = s.db.GetFilteredBooks(filter); err != nil {
-		s.httpError(w, r, 502, err)
+		s.httpError(w, r, 500, err)
 		s.logger.Error(err)
 		return
 	}
 	s.responde(w, r, 200, books)
+	s.logger.Info("Success")
+}
+
+func (s *Server) handlerRegisterUser(w http.ResponseWriter, r *http.Request) {
+	s.logger.Info("Try to register user")
+	var newUser models.User
+	err := s.bodyParse(r, &newUser)
+	if err != nil {
+		s.httpError(w, r, 500, err)
+		s.logger.Error(err)
+		return
+	}
+	if newUser, err = s.db.RegisterUser(newUser); err != nil {
+		s.httpError(w, r, 500, err)
+		s.logger.Error(err)
+		return
+	}
+	s.responde(w, r, 200, newUser)
 	s.logger.Info("Success")
 }
