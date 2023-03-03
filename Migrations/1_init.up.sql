@@ -30,9 +30,19 @@ create table bookselect (
 create table bookrent (
     clientId integer references client (id),
     instanceBookId integer references book (id),
-    startRent timestamp,
-    endRent timestamp,
+    requestDate timestamp not null,
+    startRentDate timestamp,
     deadline timestamp not null
+);
+create table renthistory(
+    clientId integer references client (id),
+    bookId integer references book (id),
+    startRentDate timestamp not null
+);
+create table sessions(
+    sessionKey integer primary key,
+    clientId integer references client (id), 
+    deadline timestamp
 );
 create view topgenres as
     select 
@@ -58,8 +68,8 @@ create view bestseller as
     from 
         bookrent, bookinstance, book
     where
-        bookrent.startRent is not null and
-        extract(month from bookrent.startRent) =  extract(month from now()) and
+        bookrent.startRentDate is not null and
+        extract(month from bookrent.startRentDate) =  extract(month from now()) and
         bookrent.instanceBookId = bookinstance.id and 
         book.id = bookinstance.originalId
     group by 
