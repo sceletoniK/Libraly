@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/sceletoniK/models"
 )
@@ -90,4 +91,42 @@ func (db *DB) RegisterUser(ctx context.Context, newUser models.User) (models.Use
 		return addedUser, fmt.Errorf("(db) RegisterUser dont commit transaction: %w", err)
 	}
 	return addedUser, nil
+}
+
+func (db *DB) AuthenticationUser(ctx context.Context, user models.User) (models.User, error) {
+	tx, err := db.conn.BeginTxx(ctx, nil)
+	if err != nil {
+		return user, fmt.Errorf("(db) AuthenticationUser dont begin transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	if err := tx.GetContext(ctx, &user, "select * from client where login = $1 and password = $2", user.Login, user.Password); err != nil {
+		return user, fmt.Errorf("(db) AuthenticationUser dont select or find user: %w", err)
+	}
+
+	if err = tx.Commit(); err != nil {
+		return user, fmt.Errorf("(db) AuthenticationUser dont commit transaction: %w", err)
+	}
+	return user, nil
+}
+
+func (db *DB) AddRefreshToken(user models.User, token string, ctx context.Context, dur time.Duration) error {
+	tx, err := db.conn.BeginTxx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("(db) AddRefreshToken dont begin transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	if _, err := tx.ExecContext(ctx, "delete from sessions where clientId = $1", user.Id); err != nil {
+		return fmt.Errorf("(db) AddRefreshToken dont delete old refresh: %w", err)
+	}
+
+	if _, err := tx.ExecContext(ctx, "insert into sessions (refreshToken, clientId, expiresAt) values ($1, $2, $3)", token, user.Id, time.Now().Add(dur)); err != nil {
+		return fmt.Errorf("(db) AddRefreshToken dont add new refresh: %w", err)
+	}
+
+	if err = tx.Commit(); err != nil {
+		return fmt.Errorf("(db) AddRefreshToken dont commit transaction: %w", err)
+	}
+	return nil
 }

@@ -1,5 +1,9 @@
 package models
 
+import (
+	"time"
+)
+
 type Filter struct {
 	Name      string         `json:"name"`
 	Author    string         `json:"author"`
@@ -26,4 +30,10 @@ type Book struct {
 	Name      string `db:"name" json:"name"`
 	Author    string `db:"author" json:"author"`
 	Publisher string `db:"publisher" json:"publisher"`
+}
+
+type Session struct {
+	SessionKey string    `db:"sessionKey" json:"sessionKey"`
+	ClientId   int       `db:"clientId" json:"clientId"`
+	Deadline   time.Time `db:"deadline" json:"deadline"`
 }
