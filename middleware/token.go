@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"log"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -14,7 +15,7 @@ type AuthClaims struct {
 }
 
 func GetAccessToken(d time.Duration, user models.User, key []byte) (string, error) {
-
+	log.Println(user.Id)
 	data := AuthClaims{
 		ID:    user.Id,
 		Admin: user.Admin,

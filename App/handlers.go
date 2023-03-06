@@ -118,4 +118,5 @@ func (s *Server) handlerAuthenticationUser(w http.ResponseWriter, r *http.Reques
 	r.AddCookie(cookie)
 
 	s.responde(w, r, 200, acst)
+	s.logger.Info("Success")
 }

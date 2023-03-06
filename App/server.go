@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/sceletoniK/config"
+	"github.com/sceletoniK/middleware"
 	"github.com/sceletoniK/models"
 	"github.com/sirupsen/logrus"
 )
@@ -40,8 +41,15 @@ func NewServer(l Libraly, cfg *config.Config) *Server {
 }
 
 func (s *Server) configureRouter() {
-	s.router.Post("/newbook", s.handlerNewBook)
-	s.router.Get("/filterbook", s.handlerFilterBooks)
+
+	s.router.Group(func(rout chi.Router) {
+		rout.Use(middleware.Auth([]byte(s.config.Key)))
+
+		rout.Post("/newbook", s.handlerNewBook)
+		rout.Get("/filterbook", s.handlerFilterBooks)
+		//s.router.Post("/refresh", s.handlerRefreshToken)
+	})
+
 	s.router.Post("/register", s.handlerRegisterUser)
 	s.router.Post("/login", s.handlerAuthenticationUser)
 }
