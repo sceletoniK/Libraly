@@ -8,12 +8,15 @@ import (
 )
 
 type Config struct {
-	LogLevel   string
-	HTTPPort   string `env:"PORT"`
-	DBName     string `env:"DBNAME"`
-	DBUser     string `env:"DBUSER"`
-	DBPassword string `env:"DBPASSWORD"`
-	DBPort     string `env:"DBPORT"`
+	LogLevel    string
+	HTTPPort    string `env:"PORT"`
+	DBName      string `env:"DBNAME"`
+	DBUser      string `env:"DBUSER"`
+	DBPassword  string `env:"DBPASSWORD"`
+	DBPort      string `env:"DBPORT"`
+	AccessTime  string `env:"ACCESSTIME"`
+	RefreshTime string `env:"REFRESHTIME"`
+	Key         string `env:"KEY"`
 }
 
 func NewConfig() *Config {

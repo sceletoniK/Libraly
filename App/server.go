@@ -4,8 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/sceletoniK/config"
 	"github.com/sceletoniK/models"
 	"github.com/sirupsen/logrus"
 )
@@ -14,6 +16,8 @@ type Libraly interface {
 	AddBook(context.Context, models.NewBook) error
 	GetFilteredBooks(context.Context, models.Filter) ([]models.Book, error)
 	RegisterUser(context.Context, models.User) (models.User, error)
+	AuthenticationUser(context.Context, models.User) (models.User, error)
+	AddRefreshToken(models.User, string, context.Context, time.Duration) error
 }
 
 type Server struct {
@@ -21,13 +25,15 @@ type Server struct {
 	db         Libraly
 	httpServer *http.Server
 	logger     *logrus.Logger
+	config     *config.Config
 }
 
-func NewServer(l Libraly) *Server {
+func NewServer(l Libraly, cfg *config.Config) *Server {
 	s := &Server{
 		router: chi.NewRouter(),
 		db:     l,
 		logger: logrus.New(),
+		config: cfg,
 	}
 	s.configureRouter()
 	return s
@@ -37,7 +43,7 @@ func (s *Server) configureRouter() {
 	s.router.Post("/newbook", s.handlerNewBook)
 	s.router.Get("/filterbook", s.handlerFilterBooks)
 	s.router.Post("/register", s.handlerRegisterUser)
-
+	s.router.Post("/login", s.handlerAuthenticationUser)
 }
 
 func (s *Server) responde(w http.ResponseWriter, r *http.Request, code int, data interface{}) {

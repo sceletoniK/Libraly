@@ -40,7 +40,7 @@ create table renthistory(
     startRentDate timestamp not null
 );
 create table sessions(
-    sessionKey integer primary key,
+    sessionKey varchar(300) primary key,
     clientId integer references client (id), 
     deadline timestamp
 );

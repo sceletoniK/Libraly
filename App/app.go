@@ -16,7 +16,7 @@ func InitLogger() {
 }
 
 func Start(l Libraly, cfg *config.Config) error {
-	s := NewServer(l)
+	s := NewServer(l, cfg)
 	handler := http.Handler(s.router)
 	s.httpServer = &http.Server{
 		Handler:      handler,
