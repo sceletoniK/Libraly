@@ -62,7 +62,6 @@ func (db *DB) GetFilteredBooks(ctx context.Context, filter models.Filter) ([]mod
 		query += ` )`
 	}
 	query += ` group by book.id, book.name, book.author, book.publisher`
-	fmt.Println(query)
 	if err := db.conn.SelectContext(ctx, &books, query); err != nil {
 		return nil, fmt.Errorf("(db) GetFilterBooks cant select books: %w", err)
 	}

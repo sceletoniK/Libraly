@@ -11,10 +11,11 @@ import (
 func Auth(key []byte, lg *logrus.Logger) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			header := r.Header.Get("Middleware: Authorization")
+			lg.Info("Middleware: autorization started")
+			header := r.Header.Get("Authorization")
 			bearer := strings.Split(header, " ")
 			if len(bearer) != 2 {
-				lg.Info("Middleware: 401")
+				lg.Info("Middleware: auth header dont found")
 				w.WriteHeader(401)
 				return
 			}
@@ -40,7 +41,7 @@ func Auth(key []byte, lg *logrus.Logger) func(next http.Handler) http.Handler {
 				w.WriteHeader(500)
 				return
 			}
-
+			lg.Info("Middleware: autorization success")
 			next.ServeHTTP(w, r)
 		})
 	}
