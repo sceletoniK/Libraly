@@ -7,7 +7,18 @@ import (
 	"time"
 
 	"github.com/sceletoniK/models"
+	"golang.org/x/crypto/bcrypt"
 )
+
+func HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 10)
+	return string(bytes), err
+}
+
+func CheckPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
 
 func (db *DB) AddBook(ctx context.Context, newBook models.NewBook) error {
 	tx, err := db.conn.BeginTxx(ctx, nil)
@@ -82,6 +93,13 @@ func (db *DB) RegisterUser(ctx context.Context, newUser models.User) (models.Use
 	if len(othersUsers) > 0 {
 		return addedUser, errors.New("(db) RegisterUser: new login isn't unique")
 	}
+
+	newUser.Password, err = HashPassword(newUser.Password)
+
+	if err != nil {
+		return addedUser, fmt.Errorf("(db) RegisterUser cant hash password: %w", err)
+	}
+
 	if err := tx.GetContext(ctx, &addedUser, "insert into client (login, password, admin) values ($1,$2,$3) returning *", newUser.Login, newUser.Password, 0); err != nil {
 		return addedUser, fmt.Errorf("(db) RegisterUser cant add new user: %w", err)
 	}
@@ -93,20 +111,25 @@ func (db *DB) RegisterUser(ctx context.Context, newUser models.User) (models.Use
 }
 
 func (db *DB) AuthenticationUser(ctx context.Context, user models.User) (models.User, error) {
+	var dbUser models.User
 	tx, err := db.conn.BeginTxx(ctx, nil)
 	if err != nil {
 		return user, fmt.Errorf("(db) AuthenticationUser dont begin transaction: %w", err)
 	}
 	defer tx.Rollback()
 
-	if err := tx.GetContext(ctx, &user, "select * from client where login = $1 and password = $2", user.Login, user.Password); err != nil {
+	if err := tx.GetContext(ctx, &dbUser, "select * from client where login = $1", user.Login); err != nil {
 		return user, fmt.Errorf("(db) AuthenticationUser dont select or find user: %w", err)
+	}
+
+	if !CheckPasswordHash(user.Password, dbUser.Password) {
+		return user, fmt.Errorf("(db) AuthenticationUser password dont compare")
 	}
 
 	if err = tx.Commit(); err != nil {
 		return user, fmt.Errorf("(db) AuthenticationUser dont commit transaction: %w", err)
 	}
-	return user, nil
+	return dbUser, nil
 }
 
 func (db *DB) AddRefreshToken(user models.User, token string, ctx context.Context, dur time.Duration) error {
