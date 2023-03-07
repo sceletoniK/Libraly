@@ -29,9 +29,11 @@ func GetAccessToken(d time.Duration, user models.User, key []byte) (string, erro
 	return st, err
 }
 
-func GetRefreshToken(key []byte) (string, error) {
+func GetRefreshToken(d time.Duration, key []byte) (string, error) {
 
-	token := jwt.New(jwt.SigningMethodHS256)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(d)),
+	})
 	st, err := token.SignedString(key)
 	return st, err
 }
