@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"log"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -15,7 +14,7 @@ type AuthClaims struct {
 }
 
 func GetAccessToken(d time.Duration, user models.User, key []byte) (string, error) {
-	log.Println(user.Id)
+
 	data := AuthClaims{
 		ID:    user.Id,
 		Admin: user.Admin,
@@ -29,11 +28,17 @@ func GetAccessToken(d time.Duration, user models.User, key []byte) (string, erro
 	return st, err
 }
 
-func GetRefreshToken(d time.Duration, key []byte) (string, error) {
+func GetRefreshToken(d time.Duration, user models.User, key []byte) (string, error) {
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(d)),
-	})
+	data := AuthClaims{
+		ID:    user.Id,
+		Admin: user.Admin,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(d)),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, data)
 	st, err := token.SignedString(key)
 	return st, err
 }
