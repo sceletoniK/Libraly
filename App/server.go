@@ -19,6 +19,8 @@ type Libraly interface {
 	RegisterUser(context.Context, models.User) (models.User, error)
 	AuthenticationUser(context.Context, models.User) (models.User, error)
 	AddRefreshToken(models.User, string, context.Context, time.Duration) error
+	GetRefreshToken(string, context.Context) (models.Session, error)
+	GetUserById(int, context.Context) (models.User, error)
 }
 
 type Server struct {
@@ -43,13 +45,13 @@ func NewServer(l Libraly, cfg *config.Config) *Server {
 func (s *Server) configureRouter() {
 
 	s.router.Group(func(rout chi.Router) {
-		rout.Use(middleware.Auth([]byte(s.config.Key)))
+		rout.Use(middleware.Auth([]byte(s.config.Key), s.logger))
 
 		rout.Post("/newbook", s.handlerNewBook)
 		rout.Get("/filterbook", s.handlerFilterBooks)
-		//s.router.Post("/refresh", s.handlerRefreshToken)
-	})
 
+	})
+	s.router.Post("/refresh", s.handlerRefreshToken)
 	s.router.Post("/register", s.handlerRegisterUser)
 	s.router.Post("/login", s.handlerAuthenticationUser)
 }

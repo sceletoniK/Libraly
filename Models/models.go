@@ -33,7 +33,7 @@ type Book struct {
 }
 
 type Session struct {
-	RefreshToken string    `db:"refreshToken" json:"refreshToken"`
-	ClientId     int       `db:"clientId" json:"clientId"`
-	ExpiresAt    time.Time `db:"expiresAt" json:"expiresAt"`
+	RefreshToken string    `db:"refreshtoken" json:"refreshToken"`
+	ClientId     int       `db:"clientid" json:"clientId"`
+	ExpiresAt    time.Time `db:"expiresat" json:"expiresAt"`
 }
