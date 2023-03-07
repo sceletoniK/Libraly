@@ -131,10 +131,20 @@ func (db *DB) AddRefreshToken(user models.User, token string, ctx context.Contex
 	return nil
 }
 
-func (db *DB) GetFerreshToken(token string, ctx context.Context) (models.Session, error) {
+func (db *DB) GetRefreshToken(token string, ctx context.Context) (models.Session, error) {
 	var s models.Session
 	if err := db.conn.GetContext(ctx, &s, "select * from sessions where refreshToken = $1", token); err != nil {
 		return s, err
 	}
 	return s, nil
+}
+
+func (db *DB) GetUserById(id int, ctx context.Context) (models.User, error) {
+	var user models.User
+
+	if err := db.conn.GetContext(ctx, &user, "select * from client where clientId = $1", id); err != nil {
+		return user, err
+	}
+
+	return user, nil
 }
