@@ -47,8 +47,13 @@ func (s *Server) configureRouter() {
 	s.router.Group(func(rout chi.Router) {
 		rout.Use(middleware.Auth([]byte(s.config.Key), s.logger))
 
-		rout.Post("/newbook", s.handlerNewBook)
 		rout.Get("/filterbook", s.handlerFilterBooks)
+
+		rout.Group(func(rout chi.Router) {
+			rout.Use(middleware.Admin(s.logger))
+
+			rout.Post("/newbook", s.handlerNewBook)
+		})
 
 	})
 	s.router.Post("/refresh", s.handlerRefreshToken)

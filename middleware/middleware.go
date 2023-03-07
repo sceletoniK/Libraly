@@ -1,21 +1,27 @@
 package middleware
 
 import (
+	"context"
 	"net/http"
 	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/sceletoniK/models"
 	"github.com/sirupsen/logrus"
 )
+
+type Key struct {
+	k string
+}
 
 func Auth(key []byte, lg *logrus.Logger) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			lg.Info("Middleware: autorization started")
+			lg.Info("Auth Middleware: autorization started")
 			header := r.Header.Get("Authorization")
 			bearer := strings.Split(header, " ")
 			if len(bearer) != 2 {
-				lg.Info("Middleware: auth header dont found")
+				lg.Info("Auth Middleware: auth header dont found")
 				w.WriteHeader(401)
 				return
 			}
@@ -25,23 +31,44 @@ func Auth(key []byte, lg *logrus.Logger) func(next http.Handler) http.Handler {
 				return key, nil
 			})
 			if err != nil {
-				lg.Info("Middleware: ", err)
+				lg.Info("Auth Middleware: ", err)
 				w.WriteHeader(401)
 				return
 			}
 			if !b.Valid {
-				lg.Info("Middleware: not valid token")
+				lg.Info("Auth Middleware: not valid token")
 				w.WriteHeader(401)
 				return
 			}
 
-			_, ok := b.Claims.(*AuthClaims)
+			claim, ok := b.Claims.(*AuthClaims)
 			if !ok {
-				lg.Info("Middleware: claims - ", ok)
+				lg.Info("Auth Middleware: claims - ", ok)
 				w.WriteHeader(500)
 				return
 			}
-			lg.Info("Middleware: autorization success")
+			user := models.User{
+				Id:    claim.ID,
+				Admin: claim.Admin,
+			}
+			lg.Info("Auth Middleware: autorization success")
+			r = r.WithContext(context.WithValue(r.Context(), Key{k: "id"}, user))
+			next.ServeHTTP(w, r)
+		})
+	}
+}
+
+func Admin(lg *logrus.Logger) func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			lg.Info("Admin Middleware: autorization started")
+			user := r.Context().Value(Key{k: "id"}).(models.User)
+			if !user.Admin {
+				lg.Info("Admin Middleware: forbidden")
+				w.WriteHeader(401)
+				return
+			}
+			lg.Info("Admin Middleware: autorization success")
 			next.ServeHTTP(w, r)
 		})
 	}
