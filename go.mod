@@ -12,6 +12,7 @@ require (
 	github.com/lib/pq v1.10.7
 	github.com/sirupsen/logrus v1.9.0
 	golang.org/x/crypto v0.7.0
+	golang.org/x/exp v0.0.0-20230307190834-24139beb5833
 )
 
 require (

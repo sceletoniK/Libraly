@@ -19,12 +19,31 @@ func (s *Server) handlerNewBook(w http.ResponseWriter, r *http.Request) {
 		s.logger.Error(err)
 		return
 	}
+	s.logger.Info(book.Genres)
 	if err = s.db.AddBook(r.Context(), book); err != nil {
 		s.httpError(w, r, 500, err)
 		s.logger.Error(err)
 		return
 	}
 	s.responde(w, r, 200, "Книга добавлена")
+	s.logger.Info("Success")
+}
+
+func (s *Server) handlerEditBook(w http.ResponseWriter, r *http.Request) {
+	s.logger.Info("Try to edit book")
+	var book models.NewBook
+	err := s.bodyParse(r, &book)
+	if err != nil {
+		s.httpError(w, r, 500, err)
+		s.logger.Error(err)
+		return
+	}
+	if err = s.db.EditBook(r.Context(), book); err != nil {
+		s.httpError(w, r, 500, err)
+		s.logger.Error(err)
+		return
+	}
+	s.responde(w, r, 200, "Книга изменена")
 	s.logger.Info("Success")
 }
 

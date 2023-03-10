@@ -21,6 +21,7 @@ type Libraly interface {
 	AddRefreshToken(models.User, string, context.Context, time.Duration) error
 	GetRefreshToken(string, context.Context) (models.Session, error)
 	GetUserById(int, context.Context) (models.User, error)
+	EditBook(context.Context, models.NewBook) error
 }
 
 type Server struct {
@@ -47,15 +48,16 @@ func (s *Server) configureRouter() {
 	s.router.Group(func(rout chi.Router) {
 		rout.Use(middleware.Auth([]byte(s.config.Key), s.logger))
 
-		rout.Get("/filterbook", s.handlerFilterBooks)
-
 		rout.Group(func(rout chi.Router) {
 			rout.Use(middleware.Admin(s.logger))
 
 			rout.Post("/newbook", s.handlerNewBook)
+			rout.Put("/editbook", s.handlerEditBook)
 		})
 
 	})
+	s.router.Get("/filterbook", s.handlerFilterBooks)
+
 	s.router.Post("/refresh", s.handlerRefreshToken)
 	s.router.Post("/register", s.handlerRegisterUser)
 	s.router.Post("/login", s.handlerAuthenticationUser)
