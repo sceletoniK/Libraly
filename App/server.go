@@ -30,6 +30,7 @@ type Libraly interface {
 	DeleteFromCart(context.Context, models.Cart) error
 
 	AddBookInstance(context.Context, models.BookInstance) (models.BookInstance, error)
+	DeleteBookInstance(context.Context, models.BookInstance) error
 }
 
 type Server struct {
@@ -67,6 +68,7 @@ func (s *Server) configureRouter() {
 			rout.Delete("/book", s.handlerDeleteBook)
 
 			rout.Post("/instance", s.handlerAddBookInstance)
+			rout.Delete("/instance", s.handlerDeleteBookInstance)
 		})
 
 	})

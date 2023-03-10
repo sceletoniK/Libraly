@@ -179,6 +179,24 @@ func (db *DB) AddBookInstance(ctx context.Context, book models.BookInstance) (mo
 	return book, nil
 }
 
+func (db *DB) DeleteBookInstance(ctx context.Context, book models.BookInstance) error {
+
+	tx, err := db.conn.BeginTxx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("(db) DeleteBookInstance dont begin transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	if _, err := tx.ExecContext(ctx, "delete from bookinstance where id = $1", book.InstanceId); err != nil {
+		return fmt.Errorf("(db) DeleteBookInstance dont insert to bookinstance: %w", err)
+	}
+
+	if err = tx.Commit(); err != nil {
+		return fmt.Errorf("(db) DeleteBookInstance dont commit transaction: %w", err)
+	}
+	return nil
+}
+
 func (db *DB) GetFilteredBooks(ctx context.Context, filter models.Filter) ([]models.Book, error) {
 	var books []models.Book
 
