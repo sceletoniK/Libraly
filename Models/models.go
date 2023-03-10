@@ -38,3 +38,8 @@ type Session struct {
 	ClientId     int       `db:"clientid" json:"clientId"`
 	ExpiresAt    time.Time `db:"expiresat" json:"expiresAt"`
 }
+
+type Cart struct {
+	ClientId int `db:"clientid" json:"clientId"`
+	BookId   int `db:"bookid" json:"bookId"`
+}

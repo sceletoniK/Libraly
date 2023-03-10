@@ -127,6 +127,23 @@ func (db *DB) DeleteBook(ctx context.Context, book models.Book) error {
 	return nil
 }
 
+func (db *DB) AddToCart(ctx context.Context, cart models.Cart) error {
+	tx, err := db.conn.BeginTxx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("(db) AddToCart dont begin transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	if _, err := tx.ExecContext(ctx, "insert into bookselect(clientId, bookId) values ($1, $2)", cart.ClientId, cart.BookId); err != nil {
+		return fmt.Errorf("(db) AddToCart dont insert to bookselect: %w", err)
+	}
+
+	if err = tx.Commit(); err != nil {
+		return fmt.Errorf("(db) AddToCart dont commit transaction: %w", err)
+	}
+	return nil
+}
+
 func (db *DB) GetFilteredBooks(ctx context.Context, filter models.Filter) ([]models.Book, error) {
 	var books []models.Book
 
