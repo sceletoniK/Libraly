@@ -23,6 +23,7 @@ type Libraly interface {
 	GetUserById(int, context.Context) (models.User, error)
 	EditBook(context.Context, models.NewBook) error
 	DeleteBook(context.Context, models.Book) error
+	AddToCart(context.Context, models.Cart) error
 }
 
 type Server struct {
@@ -48,6 +49,8 @@ func (s *Server) configureRouter() {
 
 	s.router.Group(func(rout chi.Router) {
 		rout.Use(middleware.Auth([]byte(s.config.Key), s.logger))
+
+		rout.Post("/cart", s.handlerAddToCart)
 
 		rout.Group(func(rout chi.Router) {
 			rout.Use(middleware.Admin(s.logger))
