@@ -106,6 +106,27 @@ func (db *DB) EditBook(ctx context.Context, book models.NewBook) error {
 	return nil
 }
 
+func (db *DB) DeleteBook(ctx context.Context, book models.Book) error {
+	tx, err := db.conn.BeginTxx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("(db) DelBook dont begin transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	if _, err := tx.ExecContext(ctx, "delete from bookgenre where bookId = $1", book.Id); err != nil {
+		return fmt.Errorf("(db) DelBook dont delete genres: %w", err)
+	}
+
+	if _, err := tx.ExecContext(ctx, "delete from book where id = $1", book.Id); err != nil {
+		return fmt.Errorf("(db) DelBook dont delete book: %w", err)
+	}
+
+	if err = tx.Commit(); err != nil {
+		return fmt.Errorf("(db) DelBook dont commit transaction: %w", err)
+	}
+	return nil
+}
+
 func (db *DB) GetFilteredBooks(ctx context.Context, filter models.Filter) ([]models.Book, error) {
 	var books []models.Book
 
