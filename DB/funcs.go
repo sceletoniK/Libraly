@@ -8,6 +8,7 @@ import (
 
 	"github.com/sceletoniK/models"
 	"golang.org/x/crypto/bcrypt"
+	"golang.org/x/exp/slices"
 )
 
 func HashPassword(password string) (string, error) {
@@ -26,16 +27,14 @@ func (db *DB) AddBook(ctx context.Context, newBook models.NewBook) error {
 		return fmt.Errorf("(db) AddBook dont begin transaction: %w", err)
 	}
 	defer tx.Rollback()
-	if _, err := tx.ExecContext(ctx,
-		`insert into book (name, author, publisher) values ($1, $2, $3)`,
+
+	var book models.Book
+	if err := tx.GetContext(ctx, &book,
+		`insert into book (name, author, publisher) values ($1, $2, $3) returning *`,
 		newBook.Name, newBook.Author, newBook.Publisher); err != nil {
 		return fmt.Errorf("(db) AddBook dont enter new book: %w", err)
 	}
 
-	var book models.Book
-	if err := db.conn.GetContext(ctx, &book, `select * from book order by id desc limit 1`); err != nil {
-		return fmt.Errorf("(db) AddBook dont select new book: %w", err)
-	}
 	for _, g := range newBook.Genres {
 		if _, err := tx.ExecContext(ctx, `insert into bookgenre(bookId, genreId) values ($1, $2)`, book.Id, g); err != nil {
 			return fmt.Errorf("(db) AddBook dont link genre: %w", err)
@@ -43,6 +42,66 @@ func (db *DB) AddBook(ctx context.Context, newBook models.NewBook) error {
 	}
 	if err = tx.Commit(); err != nil {
 		return fmt.Errorf("(db) AddBook dont commit transaction: %w", err)
+	}
+	return nil
+}
+
+func (db *DB) EditBook(ctx context.Context, book models.NewBook) error {
+
+	tx, err := db.conn.BeginTxx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("(db) EditBook dont begin transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	request := ""
+
+	if book.Name != "" {
+		request += "name = '" + book.Name + "'"
+	}
+	if book.Author != "" {
+		if len(request) > 0 {
+			request += ","
+		}
+		request += "author = '" + book.Author + "'"
+	}
+	if book.Publisher != "" {
+		if len(request) > 0 {
+			request += ","
+		}
+		request += "publisher = '" + book.Publisher + "'"
+	}
+
+	if _, err := tx.ExecContext(ctx, "update book set "+request+" where id = $1", book.Id); err != nil {
+		return fmt.Errorf("(db) EditBook dont update book: %w", err)
+	}
+
+	var genres []int
+
+	if err := tx.SelectContext(ctx, &genres, "select genreId from bookgenre where bookId = $1", book.Id); err != nil {
+		return fmt.Errorf("(db) EditBook dont select genres: %w", err)
+	}
+
+	for _, g := range book.Genres {
+		var j int
+		if j = slices.IndexFunc(genres, func(i int) bool { return i == g }); j == -1 {
+			if _, err := tx.ExecContext(ctx, "insert into bookgenre(bookId, genreId) values ($1, $2)", book.Id, g); err != nil {
+				fmt.Println(book.Id, g)
+				return fmt.Errorf("(db) EditBook dont insert genre: %w", err)
+			}
+		} else {
+			genres = slices.Delete(genres, j, j)
+		}
+	}
+
+	for g := range genres {
+		if _, err := tx.ExecContext(ctx, "delete from bookgenre where bookId = $1 and genreId = $2", book.Id, g); err != nil {
+			return fmt.Errorf("(db) EditBook dont delete genre: %w", err)
+		}
+	}
+
+	if err = tx.Commit(); err != nil {
+		return fmt.Errorf("(db) EditBook dont commit transaction: %w", err)
 	}
 	return nil
 }

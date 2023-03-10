@@ -12,6 +12,7 @@ type Filter struct {
 }
 
 type NewBook struct {
+	Id        int            `db:"id" json:"id"`
 	Name      string         `json:"name"`
 	Author    string         `json:"author"`
 	Publisher string         `json:"publisher"`
