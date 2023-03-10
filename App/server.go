@@ -14,17 +14,22 @@ import (
 )
 
 type Libraly interface {
-	AddBook(context.Context, models.NewBook) error
 	GetFilteredBooks(context.Context, models.Filter) ([]models.Book, error)
+
+	AddBook(context.Context, models.NewBook) error
+	EditBook(context.Context, models.NewBook) error
+	DeleteBook(context.Context, models.Book) error
+
 	RegisterUser(context.Context, models.User) (models.User, error)
 	AuthenticationUser(context.Context, models.User) (models.User, error)
 	AddRefreshToken(models.User, string, context.Context, time.Duration) error
 	GetRefreshToken(string, context.Context) (models.Session, error)
 	GetUserById(int, context.Context) (models.User, error)
-	EditBook(context.Context, models.NewBook) error
-	DeleteBook(context.Context, models.Book) error
+
 	AddToCart(context.Context, models.Cart) error
 	DeleteFromCart(context.Context, models.Cart) error
+
+	AddBookInstance(context.Context, models.BookInstance) (models.BookInstance, error)
 }
 
 type Server struct {
@@ -60,10 +65,12 @@ func (s *Server) configureRouter() {
 			rout.Post("/book", s.handlerNewBook)
 			rout.Put("/book", s.handlerEditBook)
 			rout.Delete("/book", s.handlerDeleteBook)
+
+			rout.Post("/instance", s.handlerAddBookInstance)
 		})
 
 	})
-	s.router.Get("/filterbook", s.handlerFilterBooks)
+	s.router.Get("/book", s.handlerFilterBooks)
 
 	s.router.Post("/refresh", s.handlerRefreshToken)
 	s.router.Post("/register", s.handlerRegisterUser)

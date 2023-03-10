@@ -10,6 +10,24 @@ import (
 	"github.com/sceletoniK/models"
 )
 
+func (s *Server) handlerAddBookInstance(w http.ResponseWriter, r *http.Request) {
+	s.logger.Info("Try to add instance book")
+	var book models.BookInstance
+	err := s.bodyParse(r, &book)
+	if err != nil {
+		s.httpError(w, r, 500, err)
+		s.logger.Error(err)
+		return
+	}
+	if book, err = s.db.AddBookInstance(r.Context(), book); err != nil {
+		s.httpError(w, r, 500, err)
+		s.logger.Error(err)
+		return
+	}
+	s.responde(w, r, 200, book)
+	s.logger.Info("Success")
+}
+
 func (s *Server) handlerAddToCart(w http.ResponseWriter, r *http.Request) {
 	s.logger.Info("Try to add to cart")
 	var cart models.Cart
@@ -19,6 +37,7 @@ func (s *Server) handlerAddToCart(w http.ResponseWriter, r *http.Request) {
 		s.logger.Error(err)
 		return
 	}
+	cart.ClientId = r.Context().Value(middleware.Key{K: "id"}).(models.User).Id
 	if err := s.db.AddToCart(r.Context(), cart); err != nil {
 		s.httpError(w, r, 500, err)
 		s.logger.Error(err)

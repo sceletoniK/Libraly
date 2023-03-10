@@ -11,7 +11,7 @@ import (
 )
 
 type Key struct {
-	k string
+	K string
 }
 
 func Auth(key []byte, lg *logrus.Logger) func(next http.Handler) http.Handler {
@@ -52,7 +52,7 @@ func Auth(key []byte, lg *logrus.Logger) func(next http.Handler) http.Handler {
 				Admin: claim.Admin,
 			}
 			lg.Info("Auth Middleware: autorization success")
-			r = r.WithContext(context.WithValue(r.Context(), Key{k: "id"}, user))
+			r = r.WithContext(context.WithValue(r.Context(), Key{K: "id"}, user))
 			next.ServeHTTP(w, r)
 		})
 	}
@@ -62,7 +62,7 @@ func Admin(lg *logrus.Logger) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			lg.Info("Admin Middleware: autorization started")
-			user := r.Context().Value(Key{k: "id"}).(models.User)
+			user := r.Context().Value(Key{K: "id"}).(models.User)
 			if !user.Admin {
 				lg.Info("Admin Middleware: forbidden")
 				w.WriteHeader(401)

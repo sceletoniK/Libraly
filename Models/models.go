@@ -43,3 +43,8 @@ type Cart struct {
 	ClientId int `db:"clientid" json:"clientId"`
 	BookId   int `db:"bookid" json:"bookId"`
 }
+
+type BookInstance struct {
+	InstanceId int `db:"id" json:"instanceId"`
+	BookId     int `db:"originalid" json:"bookId"`
+}

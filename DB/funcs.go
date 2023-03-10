@@ -161,6 +161,24 @@ func (db *DB) DeleteFromCart(ctx context.Context, cart models.Cart) error {
 	return nil
 }
 
+func (db *DB) AddBookInstance(ctx context.Context, book models.BookInstance) (models.BookInstance, error) {
+
+	tx, err := db.conn.BeginTxx(ctx, nil)
+	if err != nil {
+		return book, fmt.Errorf("(db) AddBookInstance dont begin transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	if err := tx.GetContext(ctx, &book, "insert into bookinstance (originalId) values ($1) returning *", book.BookId); err != nil {
+		return book, fmt.Errorf("(db) AddBookInstance dont insert to bookinstance: %w", err)
+	}
+
+	if err = tx.Commit(); err != nil {
+		return book, fmt.Errorf("(db) AddBookInstance dont commit transaction: %w", err)
+	}
+	return book, nil
+}
+
 func (db *DB) GetFilteredBooks(ctx context.Context, filter models.Filter) ([]models.Book, error) {
 	var books []models.Book
 
