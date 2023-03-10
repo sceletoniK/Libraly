@@ -47,6 +47,24 @@ func (s *Server) handlerEditBook(w http.ResponseWriter, r *http.Request) {
 	s.logger.Info("Success")
 }
 
+func (s *Server) handlerDeleteBook(w http.ResponseWriter, r *http.Request) {
+	s.logger.Info("Try to delete book")
+	var book models.Book
+	err := s.bodyParse(r, &book)
+	if err != nil {
+		s.httpError(w, r, 500, err)
+		s.logger.Error(err)
+		return
+	}
+	if err = s.db.DeleteBook(r.Context(), book); err != nil {
+		s.responde(w, r, 400, "Книга используется")
+		s.logger.Error(err)
+		return
+	}
+	s.responde(w, r, 200, "Книга удалена")
+	s.logger.Info("Success")
+}
+
 func (s *Server) handlerFilterBooks(w http.ResponseWriter, r *http.Request) {
 	s.logger.Info("Try to filter books")
 	var filter models.Filter

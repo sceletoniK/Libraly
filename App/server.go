@@ -22,6 +22,7 @@ type Libraly interface {
 	GetRefreshToken(string, context.Context) (models.Session, error)
 	GetUserById(int, context.Context) (models.User, error)
 	EditBook(context.Context, models.NewBook) error
+	DeleteBook(context.Context, models.Book) error
 }
 
 type Server struct {
@@ -51,8 +52,9 @@ func (s *Server) configureRouter() {
 		rout.Group(func(rout chi.Router) {
 			rout.Use(middleware.Admin(s.logger))
 
-			rout.Post("/newbook", s.handlerNewBook)
-			rout.Put("/editbook", s.handlerEditBook)
+			rout.Post("/book", s.handlerNewBook)
+			rout.Put("/book", s.handlerEditBook)
+			rout.Delete("/book", s.handlerDeleteBook)
 		})
 
 	})
