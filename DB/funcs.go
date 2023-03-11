@@ -6,10 +6,35 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/sceletoniK/middleware"
 	"github.com/sceletoniK/models"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/exp/slices"
 )
+
+func (db *DB) AddRentRequest(ctx context.Context, book models.BookInstance) (models.Rent, error) {
+	var rent models.Rent
+	tx, err := db.conn.BeginTxx(ctx, nil)
+	if err != nil {
+		return rent, fmt.Errorf("(db) AddRequestToRent dont begin transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	if err = tx.GetContext(ctx, &book, "select * from bookinstance WHERE originalId = $1 AND (SELECT count(*) from bookrent where instanceBookId = bookinstance.id) = 0 limit 1", book.BookId); err != nil {
+		return rent, fmt.Errorf("(db) AddRequestToRent dont find free instance book: %w", err)
+	}
+
+	clientId := ctx.Value(middleware.Key{K: "id"}).(models.User).Id
+
+	if err = tx.GetContext(ctx, &rent, "insert into bookrent(clientId, instancebookid, requestdate, startrentdate, deadline) values ($1,$2,$3,null,null) returning clientId, instancebookid, requestdate", clientId, book.InstanceId, time.Now()); err != nil {
+		return rent, fmt.Errorf("(db) AddRequestToRent dont insert rent: %w", err)
+	}
+
+	if err = tx.Commit(); err != nil {
+		return rent, fmt.Errorf("(db) AddRequestToRent dont commit transaction: %w", err)
+	}
+	return rent, nil
+}
 
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 10)

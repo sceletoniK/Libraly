@@ -10,6 +10,25 @@ import (
 	"github.com/sceletoniK/models"
 )
 
+func (s *Server) handlerAddRentRequest(w http.ResponseWriter, r *http.Request) {
+	s.logger.Info("Try to add rent request")
+	var book models.BookInstance
+	err := s.bodyParse(r, &book)
+	if err != nil {
+		s.httpError(w, r, 500, err)
+		s.logger.Error(err)
+		return
+	}
+	var rent models.Rent
+	if rent, err = s.db.AddRentRequest(r.Context(), book); err != nil {
+		s.responde(w, r, 400, "No free books")
+		s.logger.Error(err)
+		return
+	}
+	s.responde(w, r, 200, rent)
+	s.logger.Info("Success")
+}
+
 func (s *Server) handlerDeleteBookInstance(w http.ResponseWriter, r *http.Request) {
 	s.logger.Info("Try to delete instance book")
 	var book models.BookInstance
