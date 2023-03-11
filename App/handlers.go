@@ -10,6 +10,20 @@ import (
 	"github.com/sceletoniK/models"
 )
 
+func (s *Server) handlerGetCart(w http.ResponseWriter, r *http.Request) {
+	s.logger.Info("Try to get cart")
+
+	var books []models.Book
+	var err error
+	if books, err = s.db.GetCart(r.Context()); err != nil {
+		s.httpError(w, r, 500, err)
+		s.logger.Error(err)
+		return
+	}
+	s.responde(w, r, 200, books)
+	s.logger.Info("Success")
+}
+
 func (s *Server) handlerAddRentRequest(w http.ResponseWriter, r *http.Request) {
 	s.logger.Info("Try to add rent request")
 	var book models.BookInstance

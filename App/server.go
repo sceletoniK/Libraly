@@ -26,6 +26,7 @@ type Libraly interface {
 	GetRefreshToken(string, context.Context) (models.Session, error)
 	GetUserById(int, context.Context) (models.User, error)
 
+	GetCart(context.Context) ([]models.Book, error)
 	AddToCart(context.Context, models.Cart) error
 	DeleteFromCart(context.Context, models.Cart) error
 
@@ -59,6 +60,7 @@ func (s *Server) configureRouter() {
 	s.router.Group(func(rout chi.Router) {
 		rout.Use(middleware.Auth([]byte(s.config.Key), s.logger))
 
+		rout.Get("/cart", s.handlerGetCart)
 		rout.Post("/cart", s.handlerAddToCart)
 		rout.Delete("/cart", s.handlerDeleteFromCart)
 
