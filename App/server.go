@@ -34,6 +34,7 @@ type Libraly interface {
 	DeleteBookInstance(context.Context, models.BookInstance) error
 
 	AddRentRequest(context.Context, models.BookInstance) (models.Rent, error)
+	AcceptRent(context.Context, models.Rent, time.Duration) (models.Rent, error)
 }
 
 type Server struct {
@@ -75,6 +76,8 @@ func (s *Server) configureRouter() {
 
 			rout.Post("/instance", s.handlerAddBookInstance)
 			rout.Delete("/instance", s.handlerDeleteBookInstance)
+
+			rout.Put("/rent", s.hadlerAcceptRent)
 		})
 
 	})

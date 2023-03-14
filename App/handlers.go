@@ -10,6 +10,33 @@ import (
 	"github.com/sceletoniK/models"
 )
 
+func (s *Server) hadlerAcceptRent(w http.ResponseWriter, r *http.Request) {
+	s.logger.Info("Try to accept cart")
+
+	var rent models.Rent
+	err := s.bodyParse(r, &rent)
+	if err != nil {
+		s.httpError(w, r, 500, err)
+		s.logger.Error(err)
+		return
+	}
+
+	dur, err := time.ParseDuration(s.config.RentDuration)
+	if err != nil {
+		s.httpError(w, r, 500, err)
+		s.logger.Error(err)
+		return
+	}
+
+	if rent, err = s.db.AcceptRent(r.Context(), rent, dur); err != nil {
+		s.httpError(w, r, 500, err)
+		s.logger.Error(err)
+		return
+	}
+	s.responde(w, r, 200, rent)
+	s.logger.Info("Success")
+}
+
 func (s *Server) handlerGetCart(w http.ResponseWriter, r *http.Request) {
 	s.logger.Info("Try to get cart")
 

@@ -12,6 +12,24 @@ import (
 	"golang.org/x/exp/slices"
 )
 
+func (db *DB) AcceptRent(ctx context.Context, rent models.Rent, dur time.Duration) (models.Rent, error) {
+
+	tx, err := db.conn.BeginTxx(ctx, nil)
+	if err != nil {
+		return rent, fmt.Errorf("(db)  AcceptRent dont begin transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	if err := tx.GetContext(ctx, &rent, "update bookrent set startRentDate = $1, deadline = $2 where clientid = $3 and instanceBookId = $4 returning *", time.Now(), time.Now().Add(dur), rent.ClientId, rent.InstanceId); err != nil {
+		return rent, fmt.Errorf("(db)  AcceptRent cant accept rent: %w", err)
+	}
+
+	if err = tx.Commit(); err != nil {
+		return rent, fmt.Errorf("(db)  AcceptRent dont commit transaction: %w", err)
+	}
+	return rent, nil
+}
+
 func (db *DB) GetCart(ctx context.Context) ([]models.Book, error) {
 	var books []models.Book
 	tx, err := db.conn.BeginTxx(ctx, nil)
