@@ -12,6 +12,26 @@ import (
 	"golang.org/x/exp/slices"
 )
 
+func (db *DB) GetUserRents(ctx context.Context) ([]models.Rent, error) {
+	var rents []models.Rent
+	tx, err := db.conn.BeginTxx(ctx, nil)
+	if err != nil {
+		return rents, fmt.Errorf("(db)  GetUserRents dont begin transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	clientId := ctx.Value(middleware.Key{K: "id"}).(models.User).Id
+
+	if err := tx.SelectContext(ctx, &rents, "select clientId, instanceBookId, requestDate, coalesce(startRentDate, timestamp '2000-01-01 00:00:00') as startRentDate, coalesce(deadline, timestamp '2000-01-01 00:00:00') as deadline from bookrent where clientId = $1", clientId); err != nil {
+		return rents, fmt.Errorf("(db)  GetUserRents dont select rents: %w", err)
+	}
+
+	if err = tx.Commit(); err != nil {
+		return rents, fmt.Errorf("(db)  GetUserRents dont commit transaction: %w", err)
+	}
+	return rents, nil
+}
+
 func (db *DB) AcceptRent(ctx context.Context, rent models.Rent, dur time.Duration) (models.Rent, error) {
 
 	tx, err := db.conn.BeginTxx(ctx, nil)
