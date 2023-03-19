@@ -56,3 +56,9 @@ type Rent struct {
 	StartRentDate time.Time `db:"startrentdate" json:"startRentDate"`
 	Deadline      time.Time `db:"deadline" json:"deadline"`
 }
+
+type FilterRent struct {
+	ClientId int  `json:"clientId"`
+	Started  bool `json:"Started"`
+	Expired  bool `json:"Expired"`
+}

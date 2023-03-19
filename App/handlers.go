@@ -10,8 +10,28 @@ import (
 	"github.com/sceletoniK/models"
 )
 
-func (s *Server) handlerGetRent(w http.ResponseWriter, r *http.Request) {
-	s.logger.Info("Try to get cart")
+func (s *Server) handlerGetUsersRents(w http.ResponseWriter, r *http.Request) {
+	s.logger.Info("Try to get all rents")
+	var rents []models.Rent
+	var flt models.FilterRent
+	err := s.bodyParse(r, &flt)
+	if err != nil {
+		s.httpError(w, r, 400, err)
+		s.logger.Error(err)
+		return
+	}
+
+	if rents, err = s.db.GetAllRents(r.Context(), flt); err != nil {
+		s.httpError(w, r, 500, err)
+		s.logger.Error(err)
+		return
+	}
+	s.responde(w, r, 200, rents)
+	s.logger.Info("Success")
+}
+
+func (s *Server) handlerGetUserRents(w http.ResponseWriter, r *http.Request) {
+	s.logger.Info("Try to get user rents")
 
 	var rents []models.Rent
 	var err error
@@ -221,6 +241,7 @@ func (s *Server) handlerFilterBooks(w http.ResponseWriter, r *http.Request) {
 		s.logger.Error(err)
 		return
 	}
+	s.logger.Info(filter.Name)
 	var books []models.Book
 	if books, err = s.db.GetFilteredBooks(r.Context(), filter); err != nil {
 		s.httpError(w, r, 500, err)

@@ -36,6 +36,7 @@ type Libraly interface {
 	AddRentRequest(context.Context, models.BookInstance) (models.Rent, error)
 	AcceptRent(context.Context, models.Rent, time.Duration) (models.Rent, error)
 	GetUserRents(context.Context) ([]models.Rent, error)
+	GetAllRents(context.Context, models.FilterRent) ([]models.Rent, error)
 }
 
 type Server struct {
@@ -67,19 +68,20 @@ func (s *Server) configureRouter() {
 		rout.Delete("/cart", s.handlerDeleteFromCart)
 
 		rout.Post("/rent", s.handlerAddRentRequest)
-		rout.Get("/rent", s.handlerGetRent)
+		rout.Get("/rent", s.handlerGetUserRents)
 
 		rout.Group(func(rout chi.Router) {
 			rout.Use(middleware.Admin(s.logger))
 
 			rout.Post("/book", s.handlerNewBook)
-			rout.Put("/book", s.handlerEditBook)
+			rout.Patch("/book", s.handlerEditBook)
 			rout.Delete("/book", s.handlerDeleteBook)
 
 			rout.Post("/instance", s.handlerAddBookInstance)
 			rout.Delete("/instance", s.handlerDeleteBookInstance)
 
 			rout.Put("/rent", s.hadlerAcceptRent)
+			rout.Get("/rents", s.handlerGetUsersRents)
 		})
 
 	})

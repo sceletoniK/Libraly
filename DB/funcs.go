@@ -12,6 +12,41 @@ import (
 	"golang.org/x/exp/slices"
 )
 
+func (db *DB) GetAllRents(ctx context.Context, flt models.FilterRent) ([]models.Rent, error) {
+	var rents []models.Rent
+	tx, err := db.conn.BeginTxx(ctx, nil)
+	if err != nil {
+		return rents, fmt.Errorf("(db)  GetAllrRents dont begin transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	query := "select clientId, instanceBookId, requestDate, coalesce(startRentDate, timestamp '2000-01-01 00:00:00') as startRentDate, coalesce(deadline, timestamp '2000-01-01 00:00:00') as deadline from bookrent"
+	and := " where "
+	if flt.ClientId != 0 {
+		query = fmt.Sprintf("%s%s ClientId = %d", query, and, flt.ClientId)
+		and = " and "
+	}
+	if flt.Started {
+		query = fmt.Sprintf("%s%s startRentDate is not null", query, and)
+		and = " and "
+	}
+	if flt.Expired {
+		query = fmt.Sprintf("%s%s now() > deadline", query, and)
+		and = " and "
+	}
+
+	query = query + " order by requestDate desc"
+	fmt.Println(query)
+	if err := tx.SelectContext(ctx, &rents, query); err != nil {
+		return rents, fmt.Errorf("(db)  GetAllRents dont select rents: %w", err)
+	}
+
+	if err = tx.Commit(); err != nil {
+		return rents, fmt.Errorf("(db)  GetAllRents dont commit transaction: %w", err)
+	}
+	return rents, nil
+}
+
 func (db *DB) GetUserRents(ctx context.Context) ([]models.Rent, error) {
 	var rents []models.Rent
 	tx, err := db.conn.BeginTxx(ctx, nil)
