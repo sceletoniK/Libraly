@@ -65,7 +65,7 @@ func Admin(lg *logrus.Logger) func(next http.Handler) http.Handler {
 			user := r.Context().Value(Key{K: "id"}).(models.User)
 			if !user.Admin {
 				lg.Info("Admin Middleware: forbidden")
-				w.WriteHeader(401)
+				w.WriteHeader(403)
 				return
 			}
 			lg.Info("Admin Middleware: autorization success")

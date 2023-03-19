@@ -10,6 +10,24 @@ import (
 	"github.com/sceletoniK/models"
 )
 
+func (s *Server) handlerRegisterAdmin(w http.ResponseWriter, r *http.Request) {
+	s.logger.Info("Try to register admin")
+	var newUser models.User
+	err := s.bodyParse(r, &newUser)
+	if err != nil {
+		s.httpError(w, r, 400, err)
+		s.logger.Error(err)
+		return
+	}
+	if newUser, err = s.db.RegisterAdmin(r.Context(), newUser); err != nil {
+		s.httpError(w, r, 500, err)
+		s.logger.Error(err)
+		return
+	}
+	s.responde(w, r, 200, newUser)
+	s.logger.Info("Success")
+}
+
 func (s *Server) handlerGetHistory(w http.ResponseWriter, r *http.Request) {
 	s.logger.Info("Try to get history")
 	var rents []models.RentHistory

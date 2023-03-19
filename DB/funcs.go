@@ -12,6 +12,37 @@ import (
 	"golang.org/x/exp/slices"
 )
 
+func (db *DB) RegisterAdmin(ctx context.Context, newUser models.User) (models.User, error) {
+	var addedUser models.User
+	var othersUsers []models.User
+	tx, err := db.conn.BeginTxx(ctx, nil)
+	if err != nil {
+		return addedUser, fmt.Errorf("(db) RegisterUser dont begin transaction: %w", err)
+	}
+	defer tx.Rollback()
+	if err := tx.SelectContext(ctx, &othersUsers, "select * from client where login = '"+newUser.Login+"'"); err != nil {
+		return addedUser, fmt.Errorf("(db) RegisterUser cant select users: %w", err)
+	}
+	if len(othersUsers) > 0 {
+		return addedUser, errors.New("(db) RegisterUser: new login isn't unique")
+	}
+
+	newUser.Password, err = HashPassword(newUser.Password)
+
+	if err != nil {
+		return addedUser, fmt.Errorf("(db) RegisterUser cant hash password: %w", err)
+	}
+
+	if err := tx.GetContext(ctx, &addedUser, "insert into client (login, password, admin) values ($1,$2,$3) returning *", newUser.Login, newUser.Password, 1); err != nil {
+		return addedUser, fmt.Errorf("(db) RegisterUser cant add new user: %w", err)
+	}
+	addedUser.Password = ""
+	if err = tx.Commit(); err != nil {
+		return addedUser, fmt.Errorf("(db) RegisterUser dont commit transaction: %w", err)
+	}
+	return addedUser, nil
+}
+
 func (db *DB) GetUserHistory(ctx context.Context) ([]models.RentHistory, error) {
 	var rents []models.RentHistory
 	tx, err := db.conn.BeginTxx(ctx, nil)

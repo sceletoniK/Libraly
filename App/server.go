@@ -21,6 +21,7 @@ type Libraly interface {
 	DeleteBook(context.Context, models.Book) error
 
 	RegisterUser(context.Context, models.User) (models.User, error)
+	RegisterAdmin(context.Context, models.User) (models.User, error)
 	AuthenticationUser(context.Context, models.User) (models.User, error)
 	AddRefreshToken(models.User, string, context.Context, time.Duration) error
 	GetRefreshToken(string, context.Context) (models.Session, error)
@@ -88,6 +89,8 @@ func (s *Server) configureRouter() {
 			rout.Put("/rent", s.hadlerAcceptRent)
 			rout.Delete("/rent", s.handlerCloseRent)
 			rout.Get("/rents", s.handlerGetUsersRents)
+
+			rout.Post("/admin", s.handlerRegisterAdmin)
 		})
 
 	})
