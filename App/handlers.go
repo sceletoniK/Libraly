@@ -10,6 +10,55 @@ import (
 	"github.com/sceletoniK/models"
 )
 
+func (s *Server) handlerChangeGenre(w http.ResponseWriter, r *http.Request) {
+	s.logger.Info("Try to update genres")
+	var genre models.Genre
+	err := s.bodyParse(r, &genre)
+	if err != nil {
+		s.httpError(w, r, 400, err)
+		s.logger.Error(err)
+		return
+	}
+	if genre, err = s.db.ChangeGenre(r.Context(), genre); err != nil {
+		s.httpError(w, r, 500, err)
+		s.logger.Error(err)
+		return
+	}
+	s.responde(w, r, 200, genre)
+	s.logger.Info("Success")
+}
+
+func (s *Server) handlerGetGenres(w http.ResponseWriter, r *http.Request) {
+	s.logger.Info("Try to get genres")
+	var genres []models.Genre
+	var err error
+	if genres, err = s.db.GetGenres(r.Context()); err != nil {
+		s.httpError(w, r, 500, err)
+		s.logger.Error(err)
+		return
+	}
+	s.responde(w, r, 200, genres)
+	s.logger.Info("Success")
+}
+
+func (s *Server) handlerAddGenre(w http.ResponseWriter, r *http.Request) {
+	s.logger.Info("Try to add genre")
+	var newGenre models.Genre
+	err := s.bodyParse(r, &newGenre)
+	if err != nil {
+		s.httpError(w, r, 400, err)
+		s.logger.Error(err)
+		return
+	}
+	if newGenre, err = s.db.AddGenre(r.Context(), newGenre); err != nil {
+		s.httpError(w, r, 500, err)
+		s.logger.Error(err)
+		return
+	}
+	s.responde(w, r, 200, newGenre)
+	s.logger.Info("Success")
+}
+
 func (s *Server) handlerRegisterAdmin(w http.ResponseWriter, r *http.Request) {
 	s.logger.Info("Try to register admin")
 	var newUser models.User
@@ -40,6 +89,7 @@ func (s *Server) handlerGetHistory(w http.ResponseWriter, r *http.Request) {
 	s.responde(w, r, 200, rents)
 	s.logger.Info("Success")
 }
+
 func (s *Server) handlerCloseRent(w http.ResponseWriter, r *http.Request) {
 	s.logger.Info("Try to close rent")
 	var rent models.Rent

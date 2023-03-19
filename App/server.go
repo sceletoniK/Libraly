@@ -15,10 +15,13 @@ import (
 
 type Libraly interface {
 	GetFilteredBooks(context.Context, models.Filter) ([]models.Book, error)
-
 	AddBook(context.Context, models.NewBook) error
 	EditBook(context.Context, models.NewBook) error
 	DeleteBook(context.Context, models.Book) error
+
+	GetGenres(context.Context) ([]models.Genre, error)
+	AddGenre(context.Context, models.Genre) (models.Genre, error)
+	ChangeGenre(context.Context, models.Genre) (models.Genre, error)
 
 	RegisterUser(context.Context, models.User) (models.User, error)
 	RegisterAdmin(context.Context, models.User) (models.User, error)
@@ -83,6 +86,9 @@ func (s *Server) configureRouter() {
 			rout.Patch("/book", s.handlerEditBook)
 			rout.Delete("/book", s.handlerDeleteBook)
 
+			rout.Post("/genre", s.handlerAddGenre)
+			rout.Put("/genre", s.handlerChangeGenre)
+
 			rout.Post("/instance", s.handlerAddBookInstance)
 			rout.Delete("/instance", s.handlerDeleteBookInstance)
 
@@ -95,6 +101,7 @@ func (s *Server) configureRouter() {
 
 	})
 	s.router.Get("/book", s.handlerFilterBooks)
+	s.router.Get("/genre", s.handlerGetGenres)
 
 	s.router.Post("/refresh", s.handlerRefreshToken)
 	s.router.Post("/register", s.handlerRegisterUser)

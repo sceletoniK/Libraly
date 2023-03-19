@@ -12,6 +12,59 @@ import (
 	"golang.org/x/exp/slices"
 )
 
+func (db *DB) ChangeGenre(ctx context.Context, genre models.Genre) (models.Genre, error) {
+	tx, err := db.conn.BeginTxx(ctx, nil)
+	if err != nil {
+		return genre, fmt.Errorf("(db) ChangeGenre dont begin transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	if err := tx.GetContext(ctx, &genre, "update genre set name = $1 where id = $2 returning *", genre.Name, genre.GenreId); err != nil {
+		return genre, fmt.Errorf("(db) ChangeGenre dont update rents: %w", err)
+	}
+
+	if err = tx.Commit(); err != nil {
+		return genre, fmt.Errorf("(db) ChangeGenre dont commit transaction: %w", err)
+	}
+	return genre, nil
+}
+
+func (db *DB) GetGenres(ctx context.Context) ([]models.Genre, error) {
+	var genres []models.Genre
+	tx, err := db.conn.BeginTxx(ctx, nil)
+	if err != nil {
+		return genres, fmt.Errorf("(db) GetGenres dont begin transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	if err := tx.SelectContext(ctx, &genres, "select * from genre"); err != nil {
+		return genres, fmt.Errorf("(db) GetGenres dont select rents: %w", err)
+	}
+
+	if err = tx.Commit(); err != nil {
+		return genres, fmt.Errorf("(db) GetGenres dont commit transaction: %w", err)
+	}
+	return genres, nil
+}
+
+func (db *DB) AddGenre(ctx context.Context, newGenre models.Genre) (models.Genre, error) {
+
+	tx, err := db.conn.BeginTxx(ctx, nil)
+	if err != nil {
+		return newGenre, fmt.Errorf("(db) AddGenre dont begin transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	if err := tx.GetContext(ctx, &newGenre, "insert into genre(name) values ($1) returning *", newGenre.Name); err != nil {
+		return newGenre, fmt.Errorf("(db) AddGenre dont select rents: %w", err)
+	}
+
+	if err = tx.Commit(); err != nil {
+		return newGenre, fmt.Errorf("(db) AddGenre dont commit transaction: %w", err)
+	}
+	return newGenre, nil
+}
+
 func (db *DB) RegisterAdmin(ctx context.Context, newUser models.User) (models.User, error) {
 	var addedUser models.User
 	var othersUsers []models.User

@@ -68,3 +68,8 @@ type RentHistory struct {
 	BookId        int       `db:"bookid" json:"bookId"`
 	StartRentDate time.Time `db:"startrentdate" json:"startRentDate"`
 }
+
+type Genre struct {
+	GenreId int    `db:"id" json:"genreId"`
+	Name    string `db:"name" json:"name"`
+}
