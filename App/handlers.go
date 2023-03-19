@@ -10,6 +10,37 @@ import (
 	"github.com/sceletoniK/models"
 )
 
+func (s *Server) handlerGetHistory(w http.ResponseWriter, r *http.Request) {
+	s.logger.Info("Try to get history")
+	var rents []models.RentHistory
+	var err error
+	if rents, err = s.db.GetUserHistory(r.Context()); err != nil {
+		s.httpError(w, r, 500, err)
+		s.logger.Error(err)
+		return
+	}
+	s.responde(w, r, 200, rents)
+	s.logger.Info("Success")
+}
+func (s *Server) handlerCloseRent(w http.ResponseWriter, r *http.Request) {
+	s.logger.Info("Try to close rent")
+	var rent models.Rent
+
+	err := s.bodyParse(r, &rent)
+	if err != nil {
+		s.httpError(w, r, 400, err)
+		s.logger.Error(err)
+		return
+	}
+	if err = s.db.CloseRent(r.Context(), rent); err != nil {
+		s.httpError(w, r, 500, err)
+		s.logger.Error(err)
+		return
+	}
+	s.responde(w, r, 200, "Аренда закрыта")
+	s.logger.Info("Success")
+}
+
 func (s *Server) handlerGetUsersRents(w http.ResponseWriter, r *http.Request) {
 	s.logger.Info("Try to get all rents")
 	var rents []models.Rent

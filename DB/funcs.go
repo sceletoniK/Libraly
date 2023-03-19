@@ -12,6 +12,52 @@ import (
 	"golang.org/x/exp/slices"
 )
 
+func (db *DB) GetUserHistory(ctx context.Context) ([]models.RentHistory, error) {
+	var rents []models.RentHistory
+	tx, err := db.conn.BeginTxx(ctx, nil)
+	if err != nil {
+		return rents, fmt.Errorf("(db) GetUserHistory dont begin transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	clientId := ctx.Value(middleware.Key{K: "id"}).(models.User).Id
+
+	if err := tx.SelectContext(ctx, &rents, "select * from renthistory where clientId = $1", clientId); err != nil {
+		return rents, fmt.Errorf("(db) GetUserHistory dont select rents: %w", err)
+	}
+
+	if err = tx.Commit(); err != nil {
+		return rents, fmt.Errorf("(db) GetUserHistory dont commit transaction: %w", err)
+	}
+	return rents, nil
+}
+
+func (db *DB) CloseRent(ctx context.Context, rent models.Rent) error {
+	tx, err := db.conn.BeginTxx(ctx, nil)
+	var book models.BookInstance
+	if err != nil {
+		return fmt.Errorf("(db) CloseRent dont begin transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	if err := tx.GetContext(ctx, &book, "select * from bookinstance where id = $1", rent.InstanceId); err != nil {
+		return fmt.Errorf("(db) CloseRent cant find book: %w", err)
+	}
+
+	if _, err := tx.ExecContext(ctx, "insert into RentHistory(BookId, StartRentDate, clientId) values ($1, $2, $3)", book.BookId, rent.StartRentDate, rent.ClientId); err != nil {
+		return fmt.Errorf("(db) CloseRent cant add rent in history: %w", err)
+	}
+
+	if _, err := tx.ExecContext(ctx, "delete from bookrent where clientId = $1 and instanceBookId = $2 and requestDate = $3", rent.ClientId, rent.InstanceId, rent.RequestDate); err != nil {
+		return fmt.Errorf("(db) CloseRent cant delete rent: %w", err)
+	}
+
+	if err = tx.Commit(); err != nil {
+		return fmt.Errorf("(db) CloseRent dont commit transaction: %w", err)
+	}
+	return nil
+}
+
 func (db *DB) GetAllRents(ctx context.Context, flt models.FilterRent) ([]models.Rent, error) {
 	var rents []models.Rent
 	tx, err := db.conn.BeginTxx(ctx, nil)

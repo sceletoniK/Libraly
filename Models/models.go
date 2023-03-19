@@ -62,3 +62,9 @@ type FilterRent struct {
 	Started  bool `json:"Started"`
 	Expired  bool `json:"Expired"`
 }
+
+type RentHistory struct {
+	ClientId      int       `db:"clientid" json:"clientId"`
+	BookId        int       `db:"bookid" json:"bookId"`
+	StartRentDate time.Time `db:"startrentdate" json:"startRentDate"`
+}
