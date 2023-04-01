@@ -334,12 +334,13 @@ func (s *Server) handlerDeleteBook(w http.ResponseWriter, r *http.Request) {
 func (s *Server) handlerFilterBooks(w http.ResponseWriter, r *http.Request) {
 	s.logger.Info("Try to filter books")
 	var filter models.Filter
-	err := s.bodyParse(r, &filter)
-	if err != nil {
-		s.httpError(w, r, 501, err)
-		s.logger.Error(err)
-		return
-	}
+	//err := s.bodyParse(r, &filter)
+	//if err != nil {
+	//	s.httpError(w, r, 501, err)
+	//	s.logger.Error(err)
+	//	return
+	//}
+	var err error
 	s.logger.Info(filter.Name)
 	var books []models.Book
 	if books, err = s.db.GetFilteredBooks(r.Context(), filter); err != nil {

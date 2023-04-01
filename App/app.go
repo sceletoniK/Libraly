@@ -17,7 +17,7 @@ func InitLogger() {
 
 func Start(l Libraly, cfg *config.Config) error {
 	s := NewServer(l, cfg)
-	handler := http.Handler(s.router)
+	handler := corsSettings().Handler(s.router)
 	s.httpServer = &http.Server{
 		Handler:      handler,
 		ReadTimeout:  15 * time.Second,
