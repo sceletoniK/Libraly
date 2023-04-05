@@ -30,7 +30,7 @@ function getItem(
 }
 
 const items: MenuItem[] = [
-  getItem((<Link to='/aboba'>User</Link>), '1', <PieChartOutlined />),
+  getItem((<Link to='/books'>Ассортимент</Link>), '1', <PieChartOutlined />),
 ];
 
 const App: React.FC = () => {
@@ -49,12 +49,11 @@ const App: React.FC = () => {
         <Header style={{ padding: 0, background: colorBgContainer }} />
         <Content style={{ margin: '0 16px' }}>
           <Breadcrumb style={{ margin: '16px 0' }}>
-            <Breadcrumb.Item>User</Breadcrumb.Item>
-            <Breadcrumb.Item>Bill</Breadcrumb.Item>
+            <Breadcrumb.Item>Books</Breadcrumb.Item>
           </Breadcrumb>
-          <div style={{ padding: 24, minHeight: 360, background: colorBgContainer }}>
+          <div style={{ padding: 24, minHeight: '100%', background: colorBgContainer }}>
             <Routes>
-              <Route path='/aboba' element={<Books />} />
+              <Route path='/books' element={<Books />} />
             </Routes>
           </div>
         </Content>
