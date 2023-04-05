@@ -9,7 +9,8 @@ import {
 import { Breadcrumb, Layout, Menu, theme } from 'antd';
 import { Routes, Route, Link } from 'react-router-dom';
 import Books from './pages/Books';
-import Account from './pages/Login';
+import Login from './pages/Login';
+import Registration from './pages/Registation';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -43,7 +44,7 @@ const App: React.FC = () => {
           <div style={{ padding: 24, minHeight: '100%', background: colorBgContainer }}>
             <Routes>
               <Route path='/' element={<Books />} />
-              <Route path='/account' element={<Account />}/>
+              <Route path='/account' element={<Registration />}/>
             </Routes>
           </div>
         </Content>
