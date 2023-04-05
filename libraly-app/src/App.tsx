@@ -6,32 +6,12 @@ import {
   TeamOutlined,
   UserOutlined,
 } from '@ant-design/icons';
-import type { MenuProps } from 'antd';
 import { Breadcrumb, Layout, Menu, theme } from 'antd';
 import { Routes, Route, Link } from 'react-router-dom';
 import Books from './pages/Books';
+import Account from './pages/Login';
 
 const { Header, Content, Footer, Sider } = Layout;
-
-type MenuItem = Required<MenuProps>['items'][number];
-
-function getItem(
-  label: React.ReactNode,
-  key: React.Key,
-  icon?: React.ReactNode,
-  children?: MenuItem[],
-): MenuItem {
-  return {
-    key,
-    icon,
-    children,
-    label,
-  } as MenuItem;
-}
-
-const items: MenuItem[] = [
-  getItem((<Link to='/books'>Ассортимент</Link>), '1', <PieChartOutlined />),
-];
 
 const App: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -42,18 +22,28 @@ const App: React.FC = () => {
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
+        <Menu theme="dark" defaultSelectedKeys={[ window.location.pathname ]} mode="inline">
         <div style={{ height: 32, margin: 16, background: 'rgba(255, 255, 255, 0.2)' }} />
-        <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={items} />
+          <Menu.Item key='/'icon={<FileOutlined />}>
+            <Link to='/'>Ассортимент</Link>
+          </Menu.Item>
+          <Menu.Item key='/account' icon={<PieChartOutlined />}>
+            <Link to='/account'>Личный кабинет</Link>
+          </Menu.Item>
+        </Menu>
       </Sider>
       <Layout className="site-layout">
-        <Header style={{ padding: 0, background: colorBgContainer }} />
+        <Header style={{ padding: 0, background: colorBgContainer }}>
+          <p className='header_text'>Библиотечка</p>
+        </Header>
         <Content style={{ margin: '0 16px' }}>
           <Breadcrumb style={{ margin: '16px 0' }}>
             <Breadcrumb.Item>Books</Breadcrumb.Item>
           </Breadcrumb>
           <div style={{ padding: 24, minHeight: '100%', background: colorBgContainer }}>
             <Routes>
-              <Route path='/books' element={<Books />} />
+              <Route path='/' element={<Books />} />
+              <Route path='/account' element={<Account />}/>
             </Routes>
           </div>
         </Content>

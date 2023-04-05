@@ -27,7 +27,7 @@ const Books: React.FC = () => {
   }, [])
 
   interface DataType {
-    key: React.Key;
+    id: React.Key,
     name : string,
     author : string,
     publisher : string
@@ -138,9 +138,9 @@ const Books: React.FC = () => {
   } else {
   return (
     <>
-    <Row>
-      <Col span={24}>
-        <Table dataSource={items} columns={columns} />
+    <Row justify='center'>
+      <Col span={18}>
+        <Table bordered dataSource={items} columns={columns} />
       </Col>
     </Row>
     </>
