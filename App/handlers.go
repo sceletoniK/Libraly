@@ -2,6 +2,7 @@ package app
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -383,6 +384,11 @@ func (s *Server) handlerAuthenticationUser(w http.ResponseWriter, r *http.Reques
 		if err == sql.ErrNoRows {
 			s.responde(w, r, 401, "Unauthorized")
 			s.logger.Info("User not found")
+			return
+		}
+		if err == fmt.Errorf("(db) AuthenticationUser password dont compare") {
+			s.responde(w, r, 401, "Unauthorized")
+			s.logger.Info("Passwords dont compare")
 			return
 		}
 		s.httpError(w, r, 500, err)

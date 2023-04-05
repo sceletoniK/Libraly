@@ -517,7 +517,7 @@ func (db *DB) AuthenticationUser(ctx context.Context, user models.User) (models.
 	defer tx.Rollback()
 
 	if err := tx.GetContext(ctx, &dbUser, "select * from client where login = $1", user.Login); err != nil {
-		return user, fmt.Errorf("(db) AuthenticationUser dont select or find user: %w", err)
+		return user, err
 	}
 
 	if !CheckPasswordHash(user.Password, dbUser.Password) {

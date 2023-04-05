@@ -10,6 +10,7 @@ func corsSettings() *cors.Cors {
 	return cors.New(cors.Options{
 		AllowedMethods: []string{
 			http.MethodGet,
+			http.MethodPost,
 		},
 		AllowedOrigins: []string{
 			"http://localhost:3000",
