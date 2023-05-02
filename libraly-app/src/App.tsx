@@ -11,6 +11,7 @@ import { Routes, Route, Link } from 'react-router-dom';
 import Books from './pages/Books/Books';
 import Login from './pages/Login/Login';
 import Registration from './pages/Registration/Registation';
+import Account from "./pages/Account/Account";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -44,7 +45,9 @@ const App: React.FC = () => {
           <div style={{ padding: 24, minHeight: '100%', background: colorBgContainer }}>
             <Routes>
               <Route path='/' element={<Books />} />
-              <Route path='/account' element={<Login />}/>
+              <Route path='/account' element={<Account />}/>
+              <Route path='/reg' element={<Registration />}/>
+              <Route path='/login' element={<Login />}/>
             </Routes>
           </div>
         </Content>
