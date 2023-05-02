@@ -1,45 +1,40 @@
-import React, {useState, useEffect} from 'react';
-import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Checkbox, Form, Input, Alert } from 'antd';
+import React, {useState} from 'react';
+import axios, {AxiosError} from 'axios'
+import {LockOutlined, UserOutlined} from '@ant-design/icons';
+import {Button, Form, Input, Alert} from 'antd';
 import './Login.css';
-import { validateHeaderName } from 'http';
-import Password from 'antd/es/input/Password';
-
+import {useNavigate} from "react-router-dom";
 
 
 const Login: React.FC = () => {
 
     const [err, setErr] = useState<string>('');
-    const [error, setError] = useState<Error | null>(null);
-    const [isLoaded, setIsLoaded] = useState(true);
-    
+    const navigate = useNavigate();
 
     const FinishLogin = (values: any) => {
-        setIsLoaded(false);
-        fetch("http://localhost:8080/login",
+        axios.post("http://localhost:8080/login",
             {
-                method: 'POST',
-                body: JSON.stringify({
-                    login: values.username,
-                    password: values.password
-                })
-            })
-            .then(res => res.json())
-            .then(
-                (result) => {
-                    setIsLoaded(true);
-                    if (result == 'Unauthorized') {
-                        setErr('Неправильный логин или пароль')
-                    }
-                    else{
-                        localStorage.setItem('token', result);
-                    }
-                },
-                (error) => {
-                    setIsLoaded(true);
-                    setErr(error.message);
+                login: values.username,
+                password: values.password
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json'
                 }
-            )
+            })
+            .then((result) => {
+                localStorage.setItem('token', result.data);
+                navigate('/account')
+            })
+            .catch((error: AxiosError) => {
+                if (error.response && error.response.status === 401) {
+                    setErr('Неправильный логин или пароль')
+                }
+                else {
+                    console.log(error);
+                    setErr('Пятисотая на проде');
+                }
+            });
     }
 
     const handleClose = () => {
@@ -47,26 +42,26 @@ const Login: React.FC = () => {
     };
 
     return (
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <div style={{display: 'flex', justifyContent: 'center'}}>
             <Form
                 name="normal_login"
                 className="login-form"
-                initialValues={{ remember: true }}
+                initialValues={{remember: true}}
                 onFinish={FinishLogin}
 
             >
                 <Form.Item
                     name="username"
-                    rules={[{ required: true, message: 'Please input your Username!' }]}
+                    rules={[{required: true, message: 'Please input your Username!'}]}
                 >
-                    <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Username" />
+                    <Input prefix={<UserOutlined className="site-form-item-icon"/>} placeholder="Username"/>
                 </Form.Item>
                 <Form.Item
                     name="password"
-                    rules={[{ required: true, message: 'Please input your Password!' }]}
+                    rules={[{required: true, message: 'Please input your Password!'}]}
                 >
                     <Input
-                        prefix={<LockOutlined className="site-form-item-icon" />}
+                        prefix={<LockOutlined className="site-form-item-icon"/>}
                         type="password"
                         placeholder="Password"
                     />
@@ -76,11 +71,11 @@ const Login: React.FC = () => {
                     <Button type="primary" htmlType="submit" className="login-form-button" size='large'>
                         Log in
                     </Button>
-                    Or <a href="">register now!</a>
+                    Or <a href="/reg">register now!</a>
                 </Form.Item>
 
                 {err !== '' && (
-                <Alert message = {err} type="error" closable afterClose={handleClose} />
+                    <Alert message={err} type="error" closable afterClose={handleClose}/>
                 )}
             </Form>
         </div>
