@@ -37,7 +37,7 @@ func Auth(key []byte, lg *logrus.Logger) func(next http.Handler) http.Handler {
 			}
 			if !b.Valid {
 				lg.Info("Auth Middleware: not valid token")
-				w.WriteHeader(401)
+				w.WriteHeader(901)
 				return
 			}
 
