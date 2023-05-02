@@ -11,6 +11,19 @@ import (
 	"github.com/sceletoniK/models"
 )
 
+func (s *Server) handlerGetUser(w http.ResponseWriter, r *http.Request) {
+	s.logger.Info("Try to get user")
+	user := r.Context().Value(middleware.Key{K: "id"}).(models.User)
+	var err error
+	if user, err = s.db.GetUserById(user.Id, r.Context()); err != nil {
+		s.httpError(w, r, 500, err)
+		s.logger.Error(err)
+		return
+	}
+	s.responde(w, r, 200, user)
+	s.logger.Info("Success")
+}
+
 func (s *Server) handlerChangeGenre(w http.ResponseWriter, r *http.Request) {
 	s.logger.Info("Try to update genres")
 	var genre models.Genre
@@ -363,6 +376,11 @@ func (s *Server) handlerRegisterUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if newUser, err = s.db.RegisterUser(r.Context(), newUser); err != nil {
+		if err == fmt.Errorf("(db) RegisterUser: new login isn't unique") {
+			s.responde(w, r, 418, "login isn't unique")
+			s.logger.Info("New login isn't unique")
+			return
+		}
 		s.httpError(w, r, 500, err)
 		s.logger.Error(err)
 		return

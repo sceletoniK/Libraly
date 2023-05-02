@@ -562,7 +562,7 @@ func (db *DB) GetRefreshToken(token string, ctx context.Context) (models.Session
 func (db *DB) GetUserById(id int, ctx context.Context) (models.User, error) {
 	var user models.User
 
-	if err := db.conn.GetContext(ctx, &user, "select refreshToken, clientId, expiresAt from client where clientId = $1", id); err != nil {
+	if err := db.conn.GetContext(ctx, &user, "select id, login, admin from client where id = $1", id); err != nil {
 		return user, fmt.Errorf("(db) GetUserById dont get user: %w", err)
 	}
 
