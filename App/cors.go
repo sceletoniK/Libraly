@@ -11,14 +11,16 @@ func corsSettings() *cors.Cors {
 		AllowedMethods: []string{
 			http.MethodGet,
 			http.MethodPost,
+			http.MethodOptions,
 		},
 		AllowedOrigins: []string{
 			"http://localhost:3000",
 		},
 		AllowCredentials:   true,
-		AllowedHeaders:     []string{"Content-Type"},
+		AllowedHeaders:     []string{"Content-Type", "Authorization"},
 		OptionsPassthrough: true,
 		ExposedHeaders:     []string{},
 		Debug:              true,
+		MaxAge:             3600,
 	})
 }
