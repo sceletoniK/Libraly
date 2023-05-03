@@ -12,6 +12,7 @@ import Books from './pages/Books/Books';
 import Login from './pages/Login/Login';
 import Registration from './pages/Registration/Registation';
 import Account from "./pages/Account/Account";
+import Refresh from "./pages/Refresh/Refresh";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -48,6 +49,7 @@ const App: React.FC = () => {
               <Route path='/account' element={<Account />}/>
               <Route path='/reg' element={<Registration />}/>
               <Route path='/login' element={<Login />}/>
+              <Route path='/refresh' element={<Refresh/>}/>
             </Routes>
           </div>
         </Content>

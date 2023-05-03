@@ -4,10 +4,11 @@ import {LockOutlined, UserOutlined} from '@ant-design/icons';
 import {Button, Form, Input, Alert} from 'antd';
 import './Login.css';
 import {useNavigate} from "react-router-dom";
+import { useCookies } from 'react-cookie';
 
 
 const Login: React.FC = () => {
-
+    const [cookies, setCookie] = useCookies<any>(['name']);
     const [err, setErr] = useState<string>('');
     const navigate = useNavigate();
 
@@ -20,10 +21,11 @@ const Login: React.FC = () => {
             {
                 headers: {
                     'Content-Type': 'application/json'
-                }
+                },
+                withCredentials: true
             })
             .then((result) => {
-                localStorage.setItem('token', result.data);
+                localStorage.setItem('token', result.data)
                 navigate('/account')
             })
             .catch((error: AxiosError) => {

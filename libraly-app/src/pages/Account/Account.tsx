@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {useNavigate} from "react-router-dom";
+import React, {useEffect, useState, useMemo} from 'react';
+import {useNavigate, NavigateOptions} from "react-router-dom";
 import axios from "axios";
 import {Col, Row, Avatar, Typography, Tabs,} from 'antd';
 import {AxiosError} from "axios";
@@ -8,12 +8,16 @@ import './Account.css';
 
 const {Title, Text} = Typography;
 
+
+
+
 const Account: React.FC = () => {
 
     const navigate = useNavigate();
     const [isLoaded, setIsLoaded] = useState(false);
     const [items, setItems] = useState<any>([]);
     const [error, setError] = useState<AxiosError | null>(null);
+    const [refresh, setRefresh] = useState<boolean>(false)
 
     useEffect(() => {
         axios.get("http://localhost:8080/user",
@@ -30,15 +34,13 @@ const Account: React.FC = () => {
                 if (error.response && error.response.status === 401) {
                     navigate('/login');
                 } else if (error.response && error.response.status === 901) {
-                    console.log('Просрочено');
-                    navigate('/reg');
+                    navigate('/refresh')
                 } else {
                     console.log(error);
                     setError(error);
                 }
             })
-    }, []);
-
+    }, [navigate, refresh]);
     if (error) {
         return <div>Технические шоколадки, зайдите попозже :З</div>;
     } else if (!isLoaded) {
