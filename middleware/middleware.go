@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"strings"
 
@@ -31,6 +32,11 @@ func Auth(key []byte, lg *logrus.Logger) func(next http.Handler) http.Handler {
 				return key, nil
 			})
 			if err != nil {
+				if errors.As(jwt.ErrTokenExpired, &err) {
+					lg.Info("Auth Middleware: token is expired")
+					w.WriteHeader(901)
+					return
+				}
 				lg.Info("Auth Middleware: ", err)
 				w.WriteHeader(401)
 				return

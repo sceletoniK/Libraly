@@ -2,6 +2,7 @@ package app
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -472,7 +473,7 @@ func (s *Server) handlerRefreshToken(w http.ResponseWriter, r *http.Request) {
 	b, err := jwt.ParseWithClaims(token, &middleware.AuthClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(s.config.Key), nil
 	})
-	if err != nil {
+	if err != nil && !errors.As(jwt.ErrTokenExpired, &err) {
 		s.logger.Info("handlerRefreshToken: ", err)
 		s.httpError(w, r, 401, err)
 		return
