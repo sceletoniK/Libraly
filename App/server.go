@@ -70,6 +70,8 @@ func (s *Server) configureRouter() {
 	s.router.Group(func(rout chi.Router) {
 		rout.Use(middleware.Auth([]byte(s.config.Key), s.logger))
 
+		rout.Get("/user", s.handlerGetUser)
+
 		rout.Get("/cart", s.handlerGetCart)
 		rout.Post("/cart", s.handlerAddToCart)
 		rout.Delete("/cart", s.handlerDeleteFromCart)
@@ -106,6 +108,7 @@ func (s *Server) configureRouter() {
 	s.router.Post("/refresh", s.handlerRefreshToken)
 	s.router.Post("/register", s.handlerRegisterUser)
 	s.router.Post("/login", s.handlerAuthenticationUser)
+	s.router.Options("/*", s.OptionResponce)
 }
 
 func (s *Server) responde(w http.ResponseWriter, r *http.Request, code int, data interface{}) {
@@ -126,4 +129,8 @@ func (s *Server) bodyParse(r *http.Request, data interface{}) error {
 		return err
 	}
 	return nil
+}
+
+func (s *Server) OptionResponce(w http.ResponseWriter, r *http.Request) {
+	s.responde(w, r, 200, "xyi")
 }
