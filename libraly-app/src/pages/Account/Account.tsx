@@ -5,6 +5,9 @@ import {Col, Row, Avatar, Typography, Tabs,} from 'antd';
 import {AxiosError} from "axios";
 import {UserOutlined, AndroidOutlined, AppleOutlined} from '@ant-design/icons';
 import './Account.css';
+import type { TabsProps } from 'antd';
+import Cart from "./Cart";
+import Rent from "./Rent";
 
 const {Title, Text} = Typography;
 
@@ -17,7 +20,6 @@ const Account: React.FC = () => {
     const [isLoaded, setIsLoaded] = useState(false);
     const [items, setItems] = useState<any>([]);
     const [error, setError] = useState<AxiosError | null>(null);
-    const [refresh, setRefresh] = useState<boolean>(false)
 
     useEffect(() => {
         axios.get("http://localhost:8080/user",
@@ -40,7 +42,26 @@ const Account: React.FC = () => {
                     setError(error);
                 }
             })
-    }, [navigate, refresh]);
+    }, [navigate]);
+
+    const tabs: TabsProps['items'] = [
+        {
+            key: '1',
+            label: `Корзина`,
+            children: <Cart/>,
+        },
+        {
+            key: '2',
+            label: `Аренды`,
+            children: <Rent/>,
+        },
+        {
+            key: '3',
+            label: `История`,
+            children: <></>,
+        },
+    ];
+
     if (error) {
         return <div>Технические шоколадки, зайдите попозже :З</div>;
     } else if (!isLoaded) {
@@ -49,34 +70,25 @@ const Account: React.FC = () => {
         return (
             <>
                 <Row justify="space-around" align="top">
-                    <Col span={4} className='avatar_column'>
+                    <Col sm={{span: 24}} lg={{span: 6}} className='avatar_column'>
                         <Avatar size={192} icon={<UserOutlined/>}/>
                         <Title level={2}>{items['login']}</Title>
+                        <Text code type="success" style={{fontSize: 18}}>Задолженностей нет</Text>
+                        <br/>
                         {items['admin'] && (
                             <Text>Администратор</Text>
                         )}
+                        <br/>
+                        <br/>
                     </Col>
-                    <Col span={16} className='tabs_column'>
+                    <Col sm={{span: 24}} lg={{span: 16}} className='tabs_column'>
                         <Tabs
                             defaultActiveKey="1"
                             centered
                             size="large"
                             type="card"
                             className='tabs'
-                            items={[AppleOutlined, AndroidOutlined].map((Icon, i) => {
-                                const id = String(i + 1);
-
-                                return {
-                                    label: (
-                                        <span>
-                                            <Icon/>
-                                            Tab {id}
-                                        </span>
-                                    ),
-                                    key: id,
-                                    children: `Tab ${id}`,
-                                };
-                            })}
+                            items={tabs}
                         />
                     </Col>
                 </Row>
