@@ -11,6 +11,8 @@ import Rent from "./Rent";
 import History from "./History";
 import BookManager from "./Admin/BookManager";
 import RentManager from "./Admin/RentManager";
+import InstanceManager from "./Admin/InstanceManager";
+import GenreManage from "./Admin/GenreManager"
 
 const {Title, Text} = Typography;
 
@@ -55,6 +57,11 @@ const Account: React.FC = () => {
                 children: <BookManager />,
             },
             {
+                key: '8',
+                label: 'Менеджер копий',
+                children: <InstanceManager />,
+            },
+            {
                 key: '5',
                 label: `Менеджер аренд`,
                 children: <RentManager />,
@@ -62,7 +69,7 @@ const Account: React.FC = () => {
             {
                 key: '6',
                 label: `Менеджер жанров`,
-                children: <></>,
+                children: <GenreManage />,
             },
             {
                 key: '7',

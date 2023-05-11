@@ -1,6 +1,8 @@
 import React, {useState, useRef} from "react";
-import {Form, Input, InputNumber, Popconfirm, Table,
-    Typography, DatePicker, Button, Divider, Upload, Row, Col, Space} from 'antd';
+import {
+    Form, Input, InputNumber, Popconfirm, Table, Select,
+    Typography, DatePicker, Button, Divider, Upload, Row, Col, Space, Tag
+} from 'antd';
 import type { InputRef } from 'antd';
 import type { ColumnsType, ColumnType } from 'antd/es/table';
 import {InboxOutlined, SearchOutlined} from '@ant-design/icons'
@@ -8,6 +10,7 @@ import type { FilterConfirmProps } from 'antd/es/table/interface';
 import moment from "moment";
 
 const { TextArea } = Input;
+const {Option} = Select
 interface BookType {
     id: React.Key,
     name: string,
@@ -279,7 +282,7 @@ const BookManager = () => {
                 wrapperCol={{ span: 16 }}
             >
                 <Row justify={'center'} gutter={40}>
-                    <Col span={8} style={{maxWidth: 300}}>
+                    <Col span={6} style={{maxWidth: 300}}>
                         <Form.Item name="dragger" valuePropName="fileList" noStyle>
                             <Upload.Dragger name="files" action="/upload.do">
                                 <p className="ant-upload-drag-icon">
@@ -290,7 +293,7 @@ const BookManager = () => {
                             </Upload.Dragger>
                         </Form.Item>
                     </Col>
-                    <Col span={8}>
+                    <Col span={9}>
                         <br/>
                         <Form.Item
                             name="Название"
@@ -319,15 +322,27 @@ const BookManager = () => {
                         <Form.Item
                             name="Дата издания"
                             label="Дата издания"
-                            style={{maxWidth: 400}}
+                            style={{maxWidth: 350}}
                         >
                             <DatePicker placeholder="Выберите дату издания" style={{width: '100%'}} />
                         </Form.Item>
                     </Col>
-                    <Col span={8}>
+                    <Col span={9}>
                         <br/>
                         <Form.Item label="Описание" required>
-                            <TextArea rows={12} autoSize={{ minRows: 10, maxRows: 10 }} placeholder='Введите описание книги'/>
+                            <TextArea rows={6} autoSize={{ minRows: 6, maxRows: 6 }} placeholder='Введите описание книги'/>
+                        </Form.Item>
+                        <Form.Item
+                            name="Жанры"
+                            label="Жанры"
+                            rules={[{ required: true, message: 'Укажите жанры книги!', type: 'array' }]}
+                        >
+                            <Select mode="multiple" placeholder="Укажите жанры книги">
+                                <Option value="1">Классика</Option>
+                                <Option value="2">Фентези</Option>
+                                <Option value="3">Детское</Option>
+                                <Option value="4">Зарубежное</Option>
+                            </Select>
                         </Form.Item>
                     </Col>
                 </Row>

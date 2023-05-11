@@ -114,7 +114,7 @@ const Rent = () => {
         return(
             <Row justify={'center'} align={'middle'} gutter={[0, 8]}>
                 <Col span={22}>
-                    <Table columns={columns} dataSource={items}/>
+                    <Table columns={columns} dataSource={items} />
                 </Col>
             </Row>
         )
