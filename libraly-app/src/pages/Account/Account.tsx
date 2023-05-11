@@ -1,13 +1,15 @@
 import React, {useEffect, useState, useMemo} from 'react';
 import {useNavigate, NavigateOptions} from "react-router-dom";
 import axios from "axios";
-import {Col, Row, Avatar, Typography, Tabs,} from 'antd';
+import {Col, Row, Avatar, Typography, Tabs, Space, Button} from 'antd';
 import {AxiosError} from "axios";
 import {UserOutlined, AndroidOutlined, AppleOutlined} from '@ant-design/icons';
 import './Account.css';
 import type { TabsProps } from 'antd';
 import Cart from "./Cart";
 import Rent from "./Rent";
+import History from "./History";
+import BookManager from "./Admin/BookManager";
 
 const {Title, Text} = Typography;
 
@@ -44,22 +46,60 @@ const Account: React.FC = () => {
             })
     }, [navigate]);
 
-    const tabs: TabsProps['items'] = [
-        {
-            key: '1',
-            label: `Корзина`,
-            children: <Cart/>,
-        },
-        {
-            key: '2',
-            label: `Аренды`,
-            children: <Rent/>,
-        },
-        {
-            key: '3',
-            label: `История`,
-            children: <></>,
-        },
+    const tabs: TabsProps['items'] = items['admin'] ?
+        [
+            {
+                key: '1',
+                label: `Корзина`,
+                children: <Cart/>,
+            },
+            {
+                key: '2',
+                label: `Аренды`,
+                children: <Rent/>,
+            },
+            {
+                key: '3',
+                label: `История`,
+                children: <History />,
+            },
+            {
+                key: '4',
+                label: `Менеджер книг`,
+                children: <BookManager />,
+            },
+            {
+                key: '5',
+                label: `Менеджер аренд`,
+                children: <></>,
+            },
+            {
+                key: '6',
+                label: `Менеджер жанров`,
+                children: <></>,
+            },
+            {
+                key: '7',
+                label: `Менеджер пользователей`,
+                children: <></>,
+            },
+
+        ] : [
+            {
+                key: '1',
+                label: `Корзина`,
+                children: <Cart/>,
+            },
+            {
+                key: '2',
+                label: `Аренды`,
+                children: <Rent/>,
+            },
+            {
+                key: '3',
+                label: `История`,
+                children: <History />,
+            },
     ];
 
     if (error) {
@@ -76,7 +116,9 @@ const Account: React.FC = () => {
                         <Text code type="success" style={{fontSize: 18}}>Задолженностей нет</Text>
                         <br/>
                         {items['admin'] && (
-                            <Text>Администратор</Text>
+                            <>
+                                <Text>Администратор</Text>
+                            </>
                         )}
                         <br/>
                         <br/>

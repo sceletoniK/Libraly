@@ -68,7 +68,6 @@ const Rent = () => {
                             ? moment(rawVal.startRentDate).format('DD/MM/YYYY') : '-'
                     })
                 })
-                console.log(data)
                 setItems(data);
                 setIsLoaded(true);
             })

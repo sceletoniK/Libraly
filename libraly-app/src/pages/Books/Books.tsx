@@ -67,8 +67,9 @@ const Books: React.FC = () => {
         return <div>Загрузка...</div>;
     } else {
         return (
-            <Row justify='center' gutter={40}>
-                <Col span={4}>
+            <Row justify='center' gutter={40} style={{height: '100%'}}>
+                <Col span={4} >
+                    <Space align={'start'}>
                     <Form
                         name="basic"
                         labelCol={{span: 8}}
@@ -121,8 +122,9 @@ const Books: React.FC = () => {
                             </Space>
                         </Form.Item>
                     </Form>
+                    </Space>
                 </Col>
-                <Col span={20}>
+                <Col span={20} >
                     <List
                         itemLayout="vertical"
                         size="large"
