@@ -13,6 +13,7 @@ import BookManager from "./Admin/BookManager";
 import RentManager from "./Admin/RentManager";
 import InstanceManager from "./Admin/InstanceManager";
 import GenreManage from "./Admin/GenreManager"
+import ClientManager from "./Admin/ClientManager";
 
 const {Title, Text} = Typography;
 
@@ -74,7 +75,7 @@ const Account: React.FC = () => {
             {
                 key: '7',
                 label: `Менеджер пользователей`,
-                children: <></>,
+                children: <ClientManager />,
             },
 
         ] : [

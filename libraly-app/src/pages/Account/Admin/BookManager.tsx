@@ -281,7 +281,7 @@ const BookManager = () => {
                 labelCol={{ span: 8 }}
                 wrapperCol={{ span: 16 }}
             >
-                <Row justify={'center'} gutter={40}>
+                <Row justify={'center'} gutter={10}>
                     <Col span={6} style={{maxWidth: 300}}>
                         <Form.Item name="dragger" valuePropName="fileList" noStyle>
                             <Upload.Dragger name="files" action="/upload.do">
