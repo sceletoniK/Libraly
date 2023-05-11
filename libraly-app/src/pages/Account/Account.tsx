@@ -10,6 +10,7 @@ import Cart from "./Cart";
 import Rent from "./Rent";
 import History from "./History";
 import BookManager from "./Admin/BookManager";
+import RentManager from "./Admin/RentManager";
 
 const {Title, Text} = Typography;
 
@@ -46,23 +47,8 @@ const Account: React.FC = () => {
             })
     }, [navigate]);
 
-    const tabs: TabsProps['items'] = items['admin'] ?
+    const tabs: TabsProps['items'] = window.location.pathname === '/admin' ?
         [
-            {
-                key: '1',
-                label: `Корзина`,
-                children: <Cart/>,
-            },
-            {
-                key: '2',
-                label: `Аренды`,
-                children: <Rent/>,
-            },
-            {
-                key: '3',
-                label: `История`,
-                children: <History />,
-            },
             {
                 key: '4',
                 label: `Менеджер книг`,
@@ -71,7 +57,7 @@ const Account: React.FC = () => {
             {
                 key: '5',
                 label: `Менеджер аренд`,
-                children: <></>,
+                children: <RentManager />,
             },
             {
                 key: '6',
@@ -116,8 +102,24 @@ const Account: React.FC = () => {
                         <Text code type="success" style={{fontSize: 18}}>Задолженностей нет</Text>
                         <br/>
                         {items['admin'] && (
+                            <Text>Администратор</Text>
+                        )}
+                        {items['admin'] && window.location.pathname === '/account' && (
                             <>
-                                <Text>Администратор</Text>
+                                <br/>
+                                <br/>
+                                <Button size={'large'} type={'primary'} onClick={() => navigate('/admin')}>
+                                    Панель администратора
+                                </Button>
+                            </>
+                        )}
+                        {items['admin'] && window.location.pathname === '/admin' && (
+                            <>
+                                <br/>
+                                <br/>
+                                <Button size={'large'} type={'primary'} onClick={() => navigate('/account')}>
+                                    Панель пользователя
+                                </Button>
                             </>
                         )}
                         <br/>

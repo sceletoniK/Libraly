@@ -1,16 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import axios from "axios";
 import {Link, useNavigate} from "react-router-dom";
-import {Button, Card, List, Space, Typography, Col, Row, Table, Tag} from "antd";
-import {
-    CloseOutlined, FileTextOutlined, ShoppingCartOutlined
-} from '@ant-design/icons';
+import {Col, Row, Table, Tag} from "antd";
 import moment from "moment";
 import {AxiosError} from "axios/index";
-import {stat} from "fs";
-import {ALL} from "dns";
-const {Text, Title} = Typography
-const { Column, ColumnGroup } = Table;
+
 
 interface RentType {
     key: number
@@ -88,7 +82,7 @@ const Rent = () => {
             title: 'Книга',
             dataIndex: 'name',
             key: 'name',
-            render:  () => <Link to={`/books`}>Наедине с собой</Link>
+            render:  () => <Link to={`/book/38`}>Наедине с собой</Link>
         },
         {
             title: 'Статус',
